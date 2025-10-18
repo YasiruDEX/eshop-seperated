@@ -106,7 +106,7 @@ app.use(
 ); // Backwards compatibility
 app.use(
   "/catalogue",
-  proxy("http://localhost:6002", {
+  proxy("https://eshop-catalogue.onrender.com", {
     proxyReqPathResolver: (req) => {
       // Map /catalogue/* to /products/*
       // But if the path already starts with /products, don't add it again
