@@ -513,14 +513,19 @@ const SearchPageContent = () => {
 
 const SearchPage = () => {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <Search size={64} className="mx-auto mb-4 text-gray-300 animate-pulse" />
-          <p className="text-gray-600 text-lg">Loading search results...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <Search
+              size={64}
+              className="mx-auto mb-4 text-gray-300 animate-pulse"
+            />
+            <p className="text-gray-600 text-lg">Loading search results...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <SearchPageContent />
     </Suspense>
   );
