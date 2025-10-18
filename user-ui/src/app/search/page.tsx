@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import {
   catalogueAPI,
   cartAPI,
@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Search, Heart } from "lucide-react";
 import { useToast } from "../../shared/hooks/useToast";
 
-const SearchPage = () => {
+const SearchPageContent = () => {
   const { isLoggedIn, user } = useAuth();
   const { refreshWishlistCount } = useWishlist();
   const router = useRouter();
@@ -508,6 +508,21 @@ const SearchPage = () => {
         </div>
       </footer>
     </div>
+  );
+};
+
+const SearchPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Search size={64} className="mx-auto mb-4 text-gray-300 animate-pulse" />
+          <p className="text-gray-600 text-lg">Loading search results...</p>
+        </div>
+      </div>
+    }>
+      <SearchPageContent />
+    </Suspense>
   );
 };
 
