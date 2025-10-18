@@ -672,48 +672,48 @@ const Header = () => {
       <div className="flex-1 flex flex-col items-center justify-start pt-20 px-4 overflow-hidden">
         <div className="w-full max-w-4xl flex flex-col h-full">
           {/* AI Header - Simple Black and White */}
-          <div className="text-center mb-8">
-            <h1 className="text-5xl font-black text-black">AI Shopping</h1>
+          <div className="text-center mb-4 md:mb-8">
+            <h1 className="text-3xl md:text-5xl font-black text-black">AI Shopping</h1>
           </div>
 
           {/* Chat Input Bar - Black and White with Cyan Send Button */}
-          <div className="bg-white border-2 border-black shadow-2xl p-4 mb-6">
-            <div className="flex items-center gap-3">
+          <div className="bg-white border-2 border-black shadow-2xl p-2 md:p-4 mb-6">
+            <div className="flex items-center gap-1 md:gap-3">
               <button
                 onClick={handleImageUpload}
-                className="p-3 hover:bg-gray-100 transition-colors"
+                className="p-2 md:p-3 hover:bg-gray-100 transition-colors flex-shrink-0"
                 title="Upload Image"
               >
-                <ImageIcon size={24} className="text-black" />
+                <ImageIcon size={18} className="text-black md:w-6 md:h-6" />
               </button>
               <button
                 onClick={handleVoiceInput}
-                className="p-3 hover:bg-gray-100 transition-colors"
+                className="p-2 md:p-3 hover:bg-gray-100 transition-colors flex-shrink-0"
                 title="Voice Input"
               >
-                <Mic size={24} className="text-black" />
+                <Mic size={18} className="text-black md:w-6 md:h-6" />
               </button>
               <input
                 type="text"
                 placeholder="Search for products..."
                 value={aiChatInput}
                 onChange={(e) => handleAiChatInput(e.target.value)}
-                className="flex-1 px-6 py-4 outline-none bg-gray-50 border-2 border-gray-300 focus:border-black transition-colors font-medium text-black text-lg"
+                className="flex-1 min-w-0 px-3 md:px-6 py-2 md:py-4 outline-none bg-gray-50 border-2 border-gray-300 focus:border-black transition-colors font-medium text-black text-sm md:text-lg"
                 autoFocus
               />
               <button
                 onClick={handleAiSend}
-                className="p-4 bg-cyan-500 hover:bg-cyan-600 transition-all shadow-lg hover:shadow-xl"
+                className="p-2 md:p-4 bg-cyan-500 hover:bg-cyan-600 transition-all shadow-lg hover:shadow-xl flex-shrink-0"
                 title="Send"
               >
-                <Send size={24} className="text-white" />
+                <Send size={18} className="text-white md:w-6 md:h-6" />
               </button>
               <button
                 onClick={handleToggleAiMode}
-                className="p-4 bg-black hover:bg-gray-800 transition-colors"
+                className="p-2 md:p-4 bg-black hover:bg-gray-800 transition-colors flex-shrink-0"
                 title="Exit AI Mode"
               >
-                <span className="text-white font-bold text-sm">✕</span>
+                <span className="text-white font-bold text-xs md:text-sm">✕</span>
               </button>
             </div>
           </div>

@@ -177,9 +177,9 @@ const SearchPageContent = () => {
       </div>
 
       {/* Products Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16 flex-grow">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-16 flex-grow">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(12)].map((_, index) => (
               <div
                 key={index}
@@ -216,7 +216,7 @@ const SearchPageContent = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {paginatedProducts.map((product) => {
                 const isInWishlist = wishlistedItems.has(product.id);
                 const isTogglingThis = togglingWishlist === product.id;
@@ -224,27 +224,27 @@ const SearchPageContent = () => {
                 return (
                   <div
                     key={product.id}
-                    className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden group relative"
+                    className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden group relative min-w-0 w-full"
                   >
-                    <div className="relative h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
                       <img
                         src={product.image_url || "/placeholder-product.png"}
                         alt={product.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-2"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-1 sm:p-2"
                         onClick={() => router.push(`/products/${product.id}`)}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = "/placeholder-product.png";
                         }}
                       />
-                      <div className="absolute top-3 right-3 bg-black text-white px-3 py-1 text-xs font-bold">
+                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-black text-white px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold">
                         NEW
                       </div>
                       {/* Wishlist Button */}
                       <button
                         onClick={() => handleToggleWishlist(product.id)}
                         disabled={isTogglingThis}
-                        className="absolute top-3 left-3 bg-white hover:bg-gray-100 p-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                        className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white hover:bg-gray-100 p-1.5 sm:p-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                         title={
                           isInWishlist
                             ? "Remove from wishlist"
@@ -252,8 +252,8 @@ const SearchPageContent = () => {
                         }
                       >
                         <Heart
-                          size={20}
-                          className={`transition-all duration-300 ${
+                          size={18}
+                          className={`sm:w-5 sm:h-5 transition-all duration-300 ${
                             isInWishlist
                               ? "fill-red-500 text-red-500"
                               : "fill-none text-black"
@@ -261,38 +261,38 @@ const SearchPageContent = () => {
                         />
                       </button>
                     </div>
-                    <div className="p-5">
+                    <div className="p-3 sm:p-5">
                       <h3
-                        className="text-lg font-bold text-black mb-3 line-clamp-2 group-hover:text-gray-600 transition-colors cursor-pointer"
+                        className="text-base sm:text-lg font-bold text-black mb-2 sm:mb-3 line-clamp-2 group-hover:text-gray-600 transition-colors cursor-pointer break-words"
                         title={product.title}
                         onClick={() => router.push(`/products/${product.id}`)}
                       >
                         {product.title}
                       </h3>
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <span className="text-3xl font-black text-black">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4">
+                        <div className="min-w-0">
+                          <span className="text-xl sm:text-2xl lg:text-3xl font-black text-black break-words">
                             {product.currency} {product.price_LKR.toFixed(2)}
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between text-sm mb-4">
-                        <span className="bg-gray-100 text-black px-3 py-1 font-semibold text-xs border border-black">
+                      <div className="flex flex-wrap items-center justify-between text-sm gap-2 mb-3 sm:mb-4">
+                        <span className="bg-gray-100 text-black px-2 sm:px-3 py-1 font-semibold text-xs border border-black whitespace-nowrap">
                           {product.website}
                         </span>
-                        <span className="text-black font-semibold">⭐ 4.5</span>
+                        <span className="text-black font-semibold whitespace-nowrap">⭐ 4.5</span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 min-w-0">
                         <button
                           onClick={() => router.push(`/products/${product.id}`)}
-                          className="flex-1 bg-black text-white text-center py-3 hover:bg-gray-800 transition-colors font-bold"
+                          className="flex-1 min-w-0 bg-black text-white text-center py-2 sm:py-3 hover:bg-gray-800 transition-colors font-bold text-xs sm:text-sm lg:text-base"
                         >
                           View Product
                         </button>
                         <button
                           onClick={() => handleAddToCart(product)}
                           disabled={addingToCart === product.id}
-                          className="bg-white text-black border-2 border-black px-5 py-3 hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-shrink-0 bg-white text-black border-2 border-black px-2 sm:px-3 lg:px-5 py-2 sm:py-3 hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                           {addingToCart === product.id ? "..." : "🛒"}
                         </button>
