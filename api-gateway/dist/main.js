@@ -210,7 +210,7 @@ app.use("/orders", (0, express_http_proxy_1.default)("http://localhost:6009", {
 app.use("/profiles", (0, express_http_proxy_1.default)("http://localhost:6006", {
     proxyReqPathResolver: (req) => `/api/profiles${req.url}`, // Map to customer service
 })); // Customer Service
-app.use("/ai-search", (0, express_http_proxy_1.default)("http://localhost:3004", {
+app.use("/ai-search", (0, express_http_proxy_1.default)("https://0f195hsk-3004.inc1.devtunnels.ms/", {
     preserveHostHdr: true,
     proxyReqPathResolver: (req) => req.url,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
