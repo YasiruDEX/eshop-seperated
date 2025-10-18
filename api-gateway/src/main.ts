@@ -180,7 +180,7 @@ app.use(
 ); // Customer Service
 app.use(
   "/ai-search",
-  proxy("http://localhost:3004", {
+  proxy("https://0f195hsk-3004.inc1.devtunnels.ms/", {
     preserveHostHdr: true,
     proxyReqPathResolver: (req) => req.url,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
