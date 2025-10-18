@@ -194,12 +194,12 @@ const WishlistPage = () => {
                   <div className="relative h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
                     <Link href={`/products/${product.id}`}>
                       <img
-                        src={product.image_url || "/placeholder-product.jpg"}
+                        src={product.image_url || "/placeholder-product.png"}
                         alt={product.title}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-product.jpg";
+                          target.src = "/placeholder-product.png";
                         }}
                       />
                     </Link>

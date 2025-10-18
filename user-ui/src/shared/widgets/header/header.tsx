@@ -928,13 +928,13 @@ const Header = () => {
                       <div className="w-24 h-24 flex-shrink-0 bg-gray-100 flex items-center justify-center p-2">
                         <img
                           src={
-                            item.product.image_url || "/placeholder-product.jpg"
+                            item.product.image_url || "/placeholder-product.png"
                           }
                           alt={item.product.title}
                           className="w-full h-full object-contain"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = "/placeholder-product.jpg";
+                            target.src = "/placeholder-product.png";
                           }}
                         />
                       </div>
@@ -1077,12 +1077,12 @@ const Header = () => {
                       className="relative h-48 overflow-hidden bg-gray-100 flex items-center justify-center"
                     >
                       <img
-                        src={product.image_url || "/placeholder-product.jpg"}
+                        src={product.image_url || "/placeholder-product.png"}
                         alt={product.title}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-product.jpg";
+                          target.src = "/placeholder-product.png";
                         }}
                       />
                       <div className="absolute top-2 right-2 bg-black text-white px-3 py-1 text-xs font-bold">

@@ -232,14 +232,14 @@ const CartPage = () => {
                     <div className="w-32 h-32 flex-shrink-0 border-2 border-black bg-gray-50 flex items-center justify-center p-2">
                       <img
                         src={
-                          item.product?.image_url || "/placeholder-product.jpg"
+                          item.product?.image_url || "/placeholder-product.png"
                         }
                         alt={item.product?.title || "Product"}
                         className="w-full h-full object-contain cursor-pointer"
                         onClick={() => router.push(`/products/${item.itemId}`)}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-product.jpg";
+                          target.src = "/placeholder-product.png";
                         }}
                       />
                     </div>

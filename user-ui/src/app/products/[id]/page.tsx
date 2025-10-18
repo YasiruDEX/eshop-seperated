@@ -255,12 +255,12 @@ const ProductDetailPage = () => {
           {/* Product Image */}
           <div className="relative border-2 border-black p-8 bg-gray-50">
             <img
-              src={product.image_url || "/placeholder-product.jpg"}
+              src={product.image_url || "/placeholder-product.png"}
               alt={product.title}
               className="w-full h-auto object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "/placeholder-product.jpg";
+                target.src = "/placeholder-product.png";
               }}
             />
 
@@ -409,12 +409,12 @@ const ProductDetailPage = () => {
                   >
                     <div className="relative h-48 overflow-hidden bg-gray-100 flex items-center justify-center">
                       <img
-                        src={item.image_url || "/placeholder-product.jpg"}
+                        src={item.image_url || "/placeholder-product.png"}
                         alt={item.title}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder-product.jpg";
+                          target.src = "/placeholder-product.png";
                         }}
                       />
                     </div>
