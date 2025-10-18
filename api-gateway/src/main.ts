@@ -85,7 +85,7 @@ app.get("/gateway-health", (req, res) => {
 // Specific routes first (before /api wildcard)
 app.use(
   "/auth",
-  proxy("https://eshop-auth-uq9z.onrender.com/api", {
+  proxy("https://eshop-auth-uq9z.onrender.com", {
     preserveHostHdr: true,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
@@ -165,7 +165,7 @@ app.use(
 ); // Checkout Service - Wishlist
 app.use(
   "/orders",
-  proxy("http://localhost:6009", {
+  proxy("https://eshop-orders.onrender.com", {
     proxyReqPathResolver: (req) => `/orders${req.url}`, // Preserve full path
   })
 ); // Order Service
