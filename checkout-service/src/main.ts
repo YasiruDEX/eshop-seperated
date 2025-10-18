@@ -6,7 +6,7 @@ import checkoutRouter from "./routes/checkout.router";
 import wishlistRouter from "./routes/wishlist.router";
 
 const app: Application = express();
-const PORT = process.env['CHECKOUT_SERVICE_PORT'] || 6008;
+const PORT = process.env["CHECKOUT_SERVICE_PORT"] || 6008;
 
 // Middleware
 app.use(cors());
@@ -32,7 +32,7 @@ app.listen(PORT, () => {
   console.log(`🛒 Checkout Service listening at http://localhost:${PORT}`);
   console.log(
     `💳 Payment Service URL: ${
-      process.env['PAYMENT_SERVICE_URL'] || "http://localhost:6004"
+      process.env["PAYMENT_SERVICE_URL"] || "http://localhost:6004"
     }`
   );
 });

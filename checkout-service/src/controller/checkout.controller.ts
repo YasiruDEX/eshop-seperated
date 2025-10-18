@@ -308,7 +308,7 @@ export const checkout = async (req: Request, res: Response) => {
 
     // Get payment service URL from environment or use default
     const paymentServiceUrl =
-      process.env['PAYMENT_SERVICE_URL'] || "http://localhost:6004";
+      process.env["PAYMENT_SERVICE_URL"] || "http://localhost:6004";
 
     // Call payment service to create Stripe payment session
     const paymentResponse = await axios.post(

@@ -37,7 +37,7 @@ app.get("/health", (req, res) => {
 // Catalogue routes
 app.use("/products", catalogueRouter);
 
-const port = process.env['CATALOGUE_PORT'] || 6002;
+const port = process.env["CATALOGUE_PORT"] || 6002;
 const server = app.listen(port, () => {
   console.log(`🚀 Catalogue Service listening at http://localhost:${port}`);
 });

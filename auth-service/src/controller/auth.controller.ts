@@ -1,7 +1,4 @@
-import {
-  AuthenticationError,
-  ValidationError,
-} from "@packages/error-handler";
+import { AuthenticationError, ValidationError } from "@packages/error-handler";
 import prisma from "../utils/prisma";
 import {
   checkOtpRestrictions,
@@ -586,7 +583,7 @@ export const updateSellerShop = async (
     if (seller.shop) {
       // Update existing shop
       const updateData: any = {};
-      
+
       if (shopName !== undefined) updateData.name = shopName;
       if (bio !== undefined) updateData.bio = bio;
       if (address !== undefined) updateData.address = address;
@@ -607,7 +604,9 @@ export const updateSellerShop = async (
       // Create new shop if doesn't exist
       if (!shopName || !address) {
         return next(
-          new ValidationError("Shop name and address are required to create a shop")
+          new ValidationError(
+            "Shop name and address are required to create a shop"
+          )
         );
       }
 
@@ -653,7 +652,7 @@ export const updateSellerProfile = async (
     }
 
     const updateData: any = {};
-    
+
     if (name !== undefined) updateData.name = name;
     if (phone_number !== undefined) updateData.phone_number = phone_number;
     if (country !== undefined) updateData.country = country;

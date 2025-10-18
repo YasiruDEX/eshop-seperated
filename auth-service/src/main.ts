@@ -40,7 +40,7 @@ app.use("/api", router);
 
 app.use(errorMiddleware);
 
-const port = Number(process.env['PORT']) || 6001;
+const port = Number(process.env["PORT"]) || 6001;
 const server = app.listen(port, "0.0.0.0", () => {
   console.log(`Auth service listening at http://0.0.0.0:${port}/api`);
   console.log(`Swagger docs at http://0.0.0.0:${port}/api-docs`);
