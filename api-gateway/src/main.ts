@@ -141,7 +141,7 @@ app.use(
 ); // Review Service
 app.use(
   "/inventory",
-  proxy("http://localhost:6010", {
+  proxy("https://eshop-inventory.onrender.com", {
     proxyReqPathResolver: (req) => `/inventory${req.url}`, // Preserve full path
   })
 ); // Inventory Service
@@ -153,13 +153,13 @@ app.use(
 ); // Messaging Service
 app.use(
   "/cart",
-  proxy("http://localhost:6008", {
+  proxy("https://eshop-checkout.onrender.com", {
     proxyReqPathResolver: (req) => `/cart${req.url}`, // Preserve full path
   })
 ); // Checkout Service
 app.use(
   "/wishlist",
-  proxy("http://localhost:6008", {
+  proxy("https://eshop-checkout.onrender.com", {
     proxyReqPathResolver: (req) => `/wishlist${req.url}`, // Preserve full path
   })
 ); // Checkout Service - Wishlist
@@ -171,7 +171,7 @@ app.use(
 ); // Order Service
 app.use(
   "/profiles",
-  proxy("http://localhost:6006", {
+  proxy("https://eshop-customer-880k.onrender.com", {
     proxyReqPathResolver: (req) => `/api/profiles${req.url}`, // Map to customer service
   })
 ); // Customer Service
