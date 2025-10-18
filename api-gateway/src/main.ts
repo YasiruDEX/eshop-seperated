@@ -3,6 +3,9 @@
  * This is only a minimal backend to get started.
  */
 
+// Disable SSL verification for development (needed for Render proxy)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 import express from "express";
 import cors from "cors";
 import proxy from "express-http-proxy";
@@ -200,7 +203,7 @@ app.use(
 app.use("/api", (req, res, next) => {
   const proxyServer = proxy("https://eshop-auth-uq9z.onrender.com", {
     proxyReqPathResolver: () => req.baseUrl + req.url,
-    preserveHostHdr: true,
+    https: true,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
       if (srcReq.headers.cookie) {
