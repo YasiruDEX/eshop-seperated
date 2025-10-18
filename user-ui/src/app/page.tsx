@@ -205,11 +205,11 @@ const HomePage = () => {
                   key={product.id}
                   className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden group relative"
                 >
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                  <div className="relative h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
                     <img
                       src={product.image_url || "/placeholder-product.jpg"}
                       alt={product.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-2"
                       onClick={() => router.push(`/products/${product.id}`)}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -433,7 +433,7 @@ const HomePage = () => {
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
-                    href="/become-seller"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Become a Seller
@@ -441,7 +441,7 @@ const HomePage = () => {
                 </li>
                 <li>
                   <Link
-                    href="/seller-benefits"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller Benefits
@@ -449,7 +449,7 @@ const HomePage = () => {
                 </li>
                 <li>
                   <Link
-                    href="/seller-faq"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller FAQ

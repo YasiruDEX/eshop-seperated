@@ -407,11 +407,11 @@ const ProductDetailPage = () => {
                     onClick={() => router.push(`/products/${item.id}`)}
                     className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden cursor-pointer group"
                   >
-                    <div className="relative h-48 overflow-hidden bg-gray-100">
+                    <div className="relative h-48 overflow-hidden bg-gray-100 flex items-center justify-center">
                       <img
                         src={item.image_url || "/placeholder-product.jpg"}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = "/placeholder-product.jpg";

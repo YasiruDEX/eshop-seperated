@@ -58,6 +58,7 @@ interface AISearchResponse {
 
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [aiMode, setAiMode] = useState(false);
@@ -924,13 +925,13 @@ const Header = () => {
                       className="bg-white border-2 border-gray-300 p-4 flex items-center gap-4"
                     >
                       {/* Product Image */}
-                      <div className="w-24 h-24 flex-shrink-0 bg-gray-100">
+                      <div className="w-24 h-24 flex-shrink-0 bg-gray-100 flex items-center justify-center p-2">
                         <img
                           src={
                             item.product.image_url || "/placeholder-product.jpg"
                           }
                           alt={item.product.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = "/placeholder-product.jpg";
@@ -1073,12 +1074,12 @@ const Header = () => {
                         setAiChatInput("");
                         setAiSearchResults({});
                       }}
-                      className="relative h-48 overflow-hidden bg-gray-100"
+                      className="relative h-48 overflow-hidden bg-gray-100 flex items-center justify-center"
                     >
                       <img
                         src={product.image_url || "/placeholder-product.jpg"}
                         alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = "/placeholder-product.jpg";
@@ -1179,18 +1180,30 @@ const Header = () => {
     // NORMAL MODE
     <div className="w-full bg-white border-b-2 border-black">
       {/* Main Header */}
-      <div className="w-[90%] max-w-[1400px] py-5 m-auto flex items-center justify-between gap-6">
-        {/* Logo */}
+      <div className="w-full md:w-[90%] max-w-[1400px] px-3 md:px-0 py-2 md:py-5 m-auto flex items-center justify-between gap-2 md:gap-6">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="md:hidden text-black hover:text-gray-600 transition-colors flex-shrink-0"
+        >
+          <Menu size={20} />
+        </button>
+
+        {/* Logo - Smaller on mobile */}
         <div className="flex-shrink-0">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="bg-black p-2 border-2 border-black">
-              <span className="text-2xl font-black text-white">TS</span>
+          <Link href="/" className="flex items-center gap-1.5 md:gap-3">
+            <div className="bg-black p-1 md:p-2 border-2 border-black">
+              <span className="text-sm md:text-2xl font-black text-white">
+                TS
+              </span>
             </div>
-            <span className="text-3xl font-black text-black">TitanStore</span>
+            <span className="text-base md:text-3xl font-black text-black hidden sm:inline">
+              TitanStore
+            </span>
           </Link>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar - Responsive for all screen sizes */}
         <div className="flex-1 max-w-[700px]">
           <div className="relative">
             <form onSubmit={handleSearch}>
@@ -1199,24 +1212,24 @@ const Header = () => {
                 placeholder="Search for products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-6 pr-32 py-3.5 border-2 border-black outline-none focus:bg-gray-100 transition-colors font-medium text-black"
+                className="w-full px-3 md:px-6 pr-20 md:pr-32 py-2 md:py-3.5 border-2 border-black outline-none focus:bg-gray-50 focus:border-blue-500 transition-colors font-medium text-black text-sm md:text-base shadow-sm"
               />
               <button
                 type="submit"
-                className="absolute top-0 right-16 h-full w-[60px] bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="absolute top-0 right-12 md:right-16 h-full w-[48px] md:w-[60px] bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
               >
-                <Search color="#fff" size={20} />
+                <Search color="#fff" size={18} className="md:w-5 md:h-5" />
               </button>
               <button
                 type="button"
                 onClick={handleToggleAiMode}
-                className="absolute top-0 right-0 h-full w-[60px] bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transition-colors flex items-center justify-center group"
+                className="absolute top-0 right-0 h-full w-[48px] md:w-[60px] bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 transition-colors flex items-center justify-center group"
                 title="Enable AI Mode"
               >
                 <Sparkles
                   color="#fff"
-                  size={20}
-                  className="group-hover:animate-pulse"
+                  size={18}
+                  className="group-hover:animate-pulse md:w-5 md:h-5"
                 />
               </button>
             </form>
@@ -1224,14 +1237,14 @@ const Header = () => {
         </div>
 
         {/* User Actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 md:gap-6">
           {/* Wishlist */}
           <Link
             href="/wishlist"
             className="relative text-black hover:text-gray-600 transition-colors"
           >
             <HeartIcon />
-            <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center font-bold border border-black">
+            <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold border border-black text-[10px] md:text-xs">
               {wishlistCount}
             </span>
           </Link>
@@ -1242,27 +1255,29 @@ const Header = () => {
             className="relative text-black hover:text-gray-600 transition-colors"
           >
             <CartIcon />
-            <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center font-bold border border-black">
+            <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold border border-black text-[10px] md:text-xs">
               {cartCount}
             </span>
           </Link>
 
-          {/* User Profile */}
-          <div className="relative flex items-center gap-2">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="text-black hover:text-gray-600 transition-colors"
-            >
-              <ProfileIcon />
-            </button>
-            <div>
-              <p className="text-sm text-gray-600">Hello,</p>
+          {/* User Profile - Desktop */}
+          <div className="hidden md:block relative">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="font-semibold text-black hover:text-gray-600 transition-colors"
+                className="text-black hover:text-gray-600 transition-colors"
               >
-                {isLoggedIn ? user?.name || "User" : "Sign In"}
+                <ProfileIcon />
               </button>
+              <div>
+                <p className="text-sm text-gray-600">Hello,</p>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="font-semibold text-black hover:text-gray-600 transition-colors"
+                >
+                  {isLoggedIn ? user?.name || "User" : "Sign In"}
+                </button>
+              </div>
             </div>
 
             {/* User Dropdown Menu */}
@@ -1328,107 +1343,205 @@ const Header = () => {
               </div>
             )}
           </div>
+
+          {/* User Profile Icon - Mobile Only */}
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="md:hidden text-black hover:text-gray-600 transition-colors"
+          >
+            <ProfileIcon />
+          </button>
         </div>
       </div>
 
+      {/* Mobile Menu Dropdown */}
+      {showMobileMenu && (
+        <div className="md:hidden bg-white border-t-2 border-black">
+          <div className="px-4 py-3 space-y-2">
+            {isLoggedIn ? (
+              <>
+                <div className="pb-2 border-b-2 border-gray-200">
+                  <p className="text-sm text-gray-600">Hello,</p>
+                  <p className="font-semibold text-black">
+                    {user?.name || "User"}
+                  </p>
+                </div>
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  My Profile
+                </Link>
+                <Link
+                  href="/orders"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  My Orders
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Wishlist
+                </Link>
+                <Link
+                  href="/inventory"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Kitchen Inventory
+                </Link>
+                <Link
+                  href="https://eshop-seller.vercel.app"
+                  className="block px-4 py-2 bg-black text-white hover:bg-gray-800 cursor-pointer rounded font-semibold text-center"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Become A Seller
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-white cursor-pointer flex items-center gap-2 rounded"
+                >
+                  <LogOut size={16} />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="block px-4 py-2 hover:bg-black hover:text-white cursor-pointer rounded"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Sign Up
+                </Link>
+                <Link
+                  href="https://eshop-seller.vercel.app"
+                  className="block px-4 py-2 bg-black text-white hover:bg-gray-800 cursor-pointer rounded font-semibold text-center"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Become A Seller
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Navigation Bar */}
       <div className="bg-black text-white border-t-2 border-black">
-        <div className="w-[90%] max-w-[1400px] m-auto flex items-center gap-8 py-3">
-          {/* All Departments Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => router.push("/search?q=")}
-              className="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-2 transition-colors font-semibold border-2 border-white"
-            >
-              <Menu size={20} />
-              <span>All Departments</span>
-            </button>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="hover:text-gray-300 transition-colors font-semibold"
-            >
-              Home
-            </Link>
-            <button
-              onClick={() => router.push("/search?q=electronics")}
-              className="hover:text-gray-300 transition-colors font-semibold"
-            >
-              Electronics
-            </button>
-            <button
-              onClick={() => router.push("/search?q=fashion")}
-              className="hover:text-gray-300 transition-colors font-semibold"
-            >
-              Fashion
-            </button>
-            <div className="relative group">
-              <button className="hover:text-gray-300 transition-colors font-semibold">
-                Products ▾
+        <div className="w-full md:w-[90%] max-w-[1400px] m-auto px-4 md:px-0 overflow-x-auto">
+          <div className="flex items-center gap-4 md:gap-8 py-3 min-w-max md:min-w-0">
+            {/* All Departments Dropdown */}
+            <div className="relative flex-shrink-0">
+              <button
+                onClick={() => router.push("/search?q=")}
+                className="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-4 md:px-6 py-1.5 md:py-2 transition-colors font-semibold border-2 border-white text-sm md:text-base whitespace-nowrap"
+              >
+                <Menu size={18} className="md:w-5 md:h-5" />
+                <span className="hidden sm:inline">All Departments</span>
+                <span className="sm:hidden">Menu</span>
               </button>
-              <div className="absolute top-full left-0 mt-2 bg-white text-black border-2 border-black min-w-[200px] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                <div className="p-2">
-                  <button
-                    onClick={() => router.push("/search?q=electronics")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Electronics
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=fashion")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Fashion
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=home")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Home & Garden
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=kitchen")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Kitchen
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=sports")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Sports
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=books")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Books
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=toys")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Toys
-                  </button>
-                  <button
-                    onClick={() => router.push("/search?q=beauty")}
-                    className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
-                  >
-                    Beauty & Health
-                  </button>
+            </div>
+
+            {/* Navigation Links */}
+            <nav className="flex items-center gap-4 md:gap-6 text-sm md:text-base">
+              <Link
+                href="/"
+                className="hover:text-gray-300 transition-colors font-semibold whitespace-nowrap"
+              >
+                Home
+              </Link>
+              <button
+                onClick={() => router.push("/search?q=electronics")}
+                className="hover:text-gray-300 transition-colors font-semibold whitespace-nowrap hidden md:block"
+              >
+                Electronics
+              </button>
+              <button
+                onClick={() => router.push("/search?q=fashion")}
+                className="hover:text-gray-300 transition-colors font-semibold whitespace-nowrap hidden md:block"
+              >
+                Fashion
+              </button>
+              <div className="relative group hidden lg:block">
+                <button className="hover:text-gray-300 transition-colors font-semibold whitespace-nowrap">
+                  Products ▾
+                </button>
+                <div className="absolute top-full left-0 mt-2 bg-white text-black border-2 border-black min-w-[200px] z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div className="p-2">
+                    <button
+                      onClick={() => router.push("/search?q=electronics")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Electronics
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=fashion")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Fashion
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=home")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Home & Garden
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=kitchen")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Kitchen
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=sports")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Sports
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=books")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Books
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=toys")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Toys
+                    </button>
+                    <button
+                      onClick={() => router.push("/search?q=beauty")}
+                      className="w-full text-left px-4 py-2 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Beauty & Health
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <Link
-              href="/become-seller"
-              className="bg-white text-black hover:bg-gray-200 px-4 py-1.5 font-semibold transition-colors border-2 border-white"
-            >
-              Become A Seller
-            </Link>
-          </nav>
+              <Link
+                href="https://eshop-seller.vercel.app"
+                className="hidden lg:block bg-white text-black hover:bg-gray-200 px-4 py-1.5 font-semibold transition-colors border-2 border-white whitespace-nowrap"
+              >
+                Become A Seller
+              </Link>
+            </nav>
+          </div>
         </div>
       </div>
     </div>

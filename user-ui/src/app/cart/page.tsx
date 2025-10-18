@@ -229,13 +229,13 @@ const CartPage = () => {
                 >
                   <div className="flex gap-4">
                     {/* Product Image */}
-                    <div className="w-32 h-32 flex-shrink-0 border-2 border-black bg-gray-50">
+                    <div className="w-32 h-32 flex-shrink-0 border-2 border-black bg-gray-50 flex items-center justify-center p-2">
                       <img
                         src={
                           item.product?.image_url || "/placeholder-product.jpg"
                         }
                         alt={item.product?.title || "Product"}
-                        className="w-full h-full object-cover cursor-pointer"
+                        className="w-full h-full object-contain cursor-pointer"
                         onClick={() => router.push(`/products/${item.itemId}`)}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -470,7 +470,7 @@ const CartPage = () => {
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
-                    href="/become-seller"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Become a Seller
@@ -478,7 +478,7 @@ const CartPage = () => {
                 </li>
                 <li>
                   <Link
-                    href="/seller-benefits"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller Benefits
@@ -486,7 +486,7 @@ const CartPage = () => {
                 </li>
                 <li>
                   <Link
-                    href="/seller-faq"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller FAQ

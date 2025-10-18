@@ -28,7 +28,8 @@ interface Product {
 
 const WishlistPage = () => {
   const { isLoggedIn, user } = useAuth();
-  const { wishlistCount, refreshWishlistCount, removeFromWishlist } = useWishlist();
+  const { wishlistCount, refreshWishlistCount, removeFromWishlist } =
+    useWishlist();
   const { success, error: showError, ToastContainer } = useToast();
   const router = useRouter();
 
@@ -53,7 +54,7 @@ const WishlistPage = () => {
     try {
       setLoading(true);
       const response = await wishlistAPI.getUserWishlist(user!.id);
-      
+
       if (response.success) {
         const items = response.data || [];
         setWishlistItems(items);
@@ -82,21 +83,24 @@ const WishlistPage = () => {
     }
   };
 
-  const handleRemoveFromWishlist = async (itemId: string, wishlistId: string) => {
+  const handleRemoveFromWishlist = async (
+    itemId: string,
+    wishlistId: string
+  ) => {
     try {
       setRemovingId(wishlistId);
       await removeFromWishlist(itemId);
-      
+
       // Remove from local state
-      setWishlistItems(prev => prev.filter(item => item.id !== wishlistId));
-      setProducts(prev => {
+      setWishlistItems((prev) => prev.filter((item) => item.id !== wishlistId));
+      setProducts((prev) => {
         const newMap = new Map(prev);
         newMap.delete(itemId);
         return newMap;
       });
 
       success("✓ Removed from wishlist");
-      
+
       // Dispatch event to update header
       window.dispatchEvent(new CustomEvent("wishlistUpdated"));
     } catch (err) {
@@ -143,7 +147,7 @@ const WishlistPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <ToastContainer />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -152,7 +156,8 @@ const WishlistPage = () => {
             My Wishlist
           </h1>
           <p className="text-gray-600">
-            {wishlistItems.length} {wishlistItems.length === 1 ? "item" : "items"} saved
+            {wishlistItems.length}{" "}
+            {wishlistItems.length === 1 ? "item" : "items"} saved
           </p>
         </div>
 
@@ -176,7 +181,7 @@ const WishlistPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {wishlistItems.map((item) => {
               const product = products.get(item.itemId);
-              
+
               if (!product) {
                 return null; // Skip if product not found
               }
@@ -186,12 +191,12 @@ const WishlistPage = () => {
                   key={item.id}
                   className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden group"
                 >
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                  <div className="relative h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
                     <Link href={`/products/${product.id}`}>
                       <img
                         src={product.image_url || "/placeholder-product.jpg"}
                         alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = "/placeholder-product.jpg";
@@ -241,7 +246,9 @@ const WishlistPage = () => {
                       </button>
 
                       <button
-                        onClick={() => handleRemoveFromWishlist(product.id, item.id)}
+                        onClick={() =>
+                          handleRemoveFromWishlist(product.id, item.id)
+                        }
                         disabled={removingId === item.id}
                         className="bg-white text-red-600 border-2 border-red-600 px-5 py-3 hover:bg-red-600 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Remove from wishlist"

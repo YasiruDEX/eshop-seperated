@@ -261,7 +261,7 @@ function PaymentSuccessContent() {
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
-                    href="/become-seller"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Become a Seller
@@ -269,7 +269,7 @@ function PaymentSuccessContent() {
                 </li>
                 <li>
                   <Link
-                    href="/seller-benefits"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller Benefits
@@ -277,7 +277,7 @@ function PaymentSuccessContent() {
                 </li>
                 <li>
                   <Link
-                    href="/seller-faq"
+                    href="https://eshop-seller.vercel.app"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     Seller FAQ
