@@ -85,7 +85,7 @@ app.get("/gateway-health", (req, res) => {
 // Specific routes first (before /api wildcard)
 app.use(
   "/auth",
-  proxy("http://localhost:6001", {
+  proxy("https://eshop-auth-uq9z.onrender.com", {
     preserveHostHdr: true,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
@@ -198,7 +198,7 @@ app.use(
 
 // Route all /api/* requests to auth service
 app.use("/api", (req, res, next) => {
-  const proxyServer = proxy("http://localhost:6001", {
+  const proxyServer = proxy("https://eshop-auth-uq9z.onrender.com", {
     proxyReqPathResolver: () => req.baseUrl + req.url,
     preserveHostHdr: true,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
