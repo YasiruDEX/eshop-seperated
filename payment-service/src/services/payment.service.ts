@@ -59,12 +59,12 @@ export const createPaymentSession = async (
     success_url: `${
       process.env.FRONTEND_SUCCESS_URL ||
       process.env.PAYMENT_SUCCESS_URL ||
-      "http://localhost:3000/payment-success"
+      "https://eshop-seperated.vercel.app/payment-success"
     }?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
     cancel_url: `${
       process.env.FRONTEND_CANCEL_URL ||
       process.env.PAYMENT_CANCEL_URL ||
-      "http://localhost:3000/cart"
+      "https://eshop-seperated.vercel.app/cart"
     }?order_id=${orderId}`,
     customer_email: customerEmail,
     metadata: {
