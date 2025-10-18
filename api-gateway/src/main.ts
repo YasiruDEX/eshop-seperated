@@ -129,7 +129,7 @@ app.use(
 ); // Notification Service
 app.use(
   "/payments",
-  proxy("http://localhost:6004", {
+  proxy("https://eshop-seperated.onrender.com", {
     proxyReqPathResolver: (req) => `/payments${req.url}`, // Preserve full path
   })
 ); // Payment Service
