@@ -1,0 +1,47 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../../generated/prisma-order"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("ORDERS_DATABASE_URL")
+}
+
+model Order {
+    id          String      @id @default(auto()) @map("_id") @db.ObjectId
+    orderId     String      @unique // Generated order ID (e.g., order_timestamp_userId_shopId)
+    userId      String // Customer user ID
+    shopId      String // Shop/Seller ID
+    shopName    String // Shop/Seller name
+    items       OrderItem[]
+    totalAmount Float
+    currency    String      @default("lkr")
+
+    // Order status
+    confirmed      Boolean @default(false) // Whether the order is confirmed by seller
+    deliveryStatus String  @default("preparing") // preparing, shipped, delivered, cancelled
+
+    // Payment info
+    paymentId     String // Reference to payment/checkout session
+    paymentStatus String @default("paid") // paid, pending, refunded
+
+    // Customer info
+    customerEmail String
+    customerName  String
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("orders")
+}
+
+// Embedded document for order items
+type OrderItem {
+    itemId      String
+    productName String
+    quantity    Int
+    price       Float
+    totalPrice  Float // quantity * price
+}

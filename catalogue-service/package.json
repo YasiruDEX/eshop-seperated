@@ -1,0 +1,28 @@
+{
+  "name": "@auth-service/catalogue-service",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/main.ts",
+  "scripts": {
+    "dev": "ts-node src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "prisma:generate": "prisma generate --schema=./prisma/catalogue.prisma"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "morgan": "^1.10.1",
+    "dotenv": "^17.2.3",
+    "@prisma/client": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.19",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "20.19.9",
+    "typescript": "~5.9.2",
+    "ts-node": "^10.9.2",
+    "prisma": "^6.2.0"
+  }
+}

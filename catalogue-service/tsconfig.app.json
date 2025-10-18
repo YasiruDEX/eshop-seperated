@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/catalogue-service",
+    "types": ["node"],
+    "rootDir": "../../",
+    "tsBuildInfoFile": "out-tsc/catalogue-service/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts", "../../packages/**/*.ts"],
+  "exclude": [
+    "out-tsc",
+    "dist",
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ]
+}

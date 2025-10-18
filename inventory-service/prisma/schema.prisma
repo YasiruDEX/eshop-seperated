@@ -1,0 +1,22 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("INVENTORY_DATABASE_URL")
+}
+
+model inventoryItems {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String   @db.ObjectId // User who owns this inventory item
+    itemId    String? // Optional product ID reference
+    itemName  String // Name of the item (can be custom or product name)
+    count     Float // Quantity of the item
+    unit      String // Unit of measurement (units, ml, L, kg, g, etc.)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@map("inventory_items")
+}

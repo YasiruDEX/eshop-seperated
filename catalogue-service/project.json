@@ -1,0 +1,42 @@
+{
+  "name": "catalogue-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/catalogue-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/catalogue-service",
+        "main": "apps/catalogue-service/src/main.ts",
+        "tsConfig": "apps/catalogue-service/tsconfig.app.json",
+        "webpackConfig": "apps/catalogue-service/webpack.config.js",
+        "assets": []
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "catalogue-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "catalogue-service:build:development"
+        },
+        "production": {
+          "buildTarget": "catalogue-service:build:production"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+generator catalogueClient {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/catalogue-client"
+}
+
+datasource cataloguedb {
+  provider = "mongodb"
+  url      = env("CATALOGUE_DATABASE_URL")
+}
+
+model catalogue {
+  id            String    @id @default(auto()) @map("_id") @cataloguedb.ObjectId
+  source_domain String?
+  title         String?
+  created_at    DateTime?
+  currency      String?
+  image_url     String?
+  last_updated  DateTime?
+  price_LKR     Float?
+  scraped_at    DateTime?
+  source_url    String?
+  website       String?
+}

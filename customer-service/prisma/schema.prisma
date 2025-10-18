@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../generated/prisma-customer"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("CUSTOMER_DATABASE_URL")
+}
+
+model Profile {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String   @unique
+  budgetLimitLkr         Float?
+  location               String?
+  
+  // Dietary needs
+  vegetarian             Boolean  @default(false)
+  vegan                  Boolean  @default(false)
+  glutenFree             Boolean  @default(false)
+  dairyFree              Boolean  @default(false)
+  organicOnly            Boolean  @default(false)
+  lowSodium              Boolean  @default(false)
+  sugarFree              Boolean  @default(false)
+  halal                  Boolean  @default(false)
+  kosher                 Boolean  @default(false)
+  allergies              String[] @default([])
+  
+  // Brand preferences
+  preferredBrands        String[] @default([])
+  dislikedBrands         String[] @default([])
+  
+  // Household inventory (stored as JSON strings)
+  currentItems           Json?
+  lowStockThreshold      Int      @default(2)
+  
+  // Loyalty membership (stored as JSON strings)
+  preferredStores        String[] @default([])
+  memberships            Json?
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("profiles")
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@payment-service/payment-service",
+  "version": "0.0.1",
+  "description": "Payment service for eshop",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "start:prod": "npm run build && npm start",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "stripe": "^17.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.10.5",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

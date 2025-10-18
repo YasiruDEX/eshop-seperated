@@ -1,0 +1,42 @@
+{
+  "name": "inventory-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/inventory-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/inventory-service",
+        "main": "apps/inventory-service/src/main.ts",
+        "tsConfig": "apps/inventory-service/tsconfig.app.json",
+        "webpackConfig": "apps/inventory-service/webpack.config.js",
+        "assets": []
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "inventory-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "inventory-service:build:development"
+        },
+        "production": {
+          "buildTarget": "inventory-service:build:production"
+        }
+      }
+    }
+  }
+}

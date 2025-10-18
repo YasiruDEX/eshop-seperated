@@ -1,0 +1,52 @@
+{
+  "name": "@auth-service/auth-service",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "node -r dotenv/config dist/main.js dotenv_config_path=../../.env"
+  },
+  "nx": {
+    "projectType": "application",
+    "sourceRoot": "apps/auth-service/src",
+    "targets": {
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@auth-service/auth-service:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@auth-service/auth-service:build:development"
+          },
+          "production": {
+            "buildTarget": "@auth-service/auth-service:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.2",
+    "cookie-parser": "1.4.7",
+    "cors": "2.8.5",
+    "dotenv": "17.2.3",
+    "ejs": "3.1.10",
+    "express": "4.21.2",
+    "jsonwebtoken": "9.0.2",
+    "nodemailer": "7.0.7",
+    "stripe": "19.1.0",
+    "swagger-autogen": "2.23.7",
+    "swagger-ui-express": "5.0.1"
+  },
+  "main": "main.js"
+}
