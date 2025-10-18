@@ -29,6 +29,7 @@ const allowedOrigins = envOrigins
       "http://localhost:3001",
       "https://eshop-seperated.vercel.app",
       "https://eshop-seller.vercel.app",
+      "https://console.cron-job.org",
       // include any public tunnel or API url set in user UI env for convenience
       process.env.NEXT_PUBLIC_GATEWAY_URL || "",
       process.env.NEXT_PUBLIC_API_URL || "",
