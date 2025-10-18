@@ -259,7 +259,9 @@ const HomePage = () => {
                       <span className="bg-gray-100 text-black px-2 sm:px-3 py-1 font-semibold text-xs border border-black whitespace-nowrap">
                         {product.website}
                       </span>
-                      <span className="text-black font-semibold whitespace-nowrap">⭐ 4.5</span>
+                      <span className="text-black font-semibold whitespace-nowrap">
+                        ⭐ 4.5
+                      </span>
                     </div>
                     <div className="flex gap-2 min-w-0">
                       <button

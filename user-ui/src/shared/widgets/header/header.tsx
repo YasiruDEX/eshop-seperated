@@ -673,7 +673,9 @@ const Header = () => {
         <div className="w-full max-w-4xl flex flex-col h-full">
           {/* AI Header - Simple Black and White */}
           <div className="text-center mb-4 md:mb-8">
-            <h1 className="text-3xl md:text-5xl font-black text-black">AI Shopping</h1>
+            <h1 className="text-3xl md:text-5xl font-black text-black">
+              AI Shopping
+            </h1>
           </div>
 
           {/* Chat Input Bar - Black and White with Cyan Send Button */}
@@ -713,7 +715,9 @@ const Header = () => {
                 className="p-2 md:p-4 bg-black hover:bg-gray-800 transition-colors flex-shrink-0"
                 title="Exit AI Mode"
               >
-                <span className="text-white font-bold text-xs md:text-sm">✕</span>
+                <span className="text-white font-bold text-xs md:text-sm">
+                  ✕
+                </span>
               </button>
             </div>
           </div>
