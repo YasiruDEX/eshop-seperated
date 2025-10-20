@@ -15,6 +15,14 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useToast } from "../shared/hooks/useToast";
 
+interface Banner {
+  id: number;
+  image: string;
+  title: string;
+  subtitle?: string;
+  link?: string;
+}
+
 const HomePage = () => {
   const { isLoggedIn, user } = useAuth();
   const { refreshWishlistCount } = useWishlist();
@@ -33,14 +41,56 @@ const HomePage = () => {
   const [reviewRatings, setReviewRatings] = useState<
     Record<string, { averageRating: number; totalReviews: number }>
   >({});
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  const banners: Banner[] = [
+    {
+      id: 1,
+      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=400&fit=crop",
+      title: "Summer Sale",
+      subtitle: "Up to 70% OFF on selected items",
+      link: "/products",
+    },
+    {
+      id: 2,
+      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=1200&h=400&fit=crop",
+      title: "Electronics Mega Sale",
+      subtitle: "Best deals on gadgets and accessories",
+      link: "/products",
+    },
+    {
+      id: 3,
+      image: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=1200&h=400&fit=crop",
+      title: "Fashion Collection",
+      subtitle: "Trending styles for every occasion",
+      link: "/products",
+    },
+    {
+      id: 4,
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop",
+      title: "Premium Offers",
+      subtitle: "Exclusive deals just for you",
+      link: "/products",
+    },
+  ];
   const itemsPerPage = 24;
   const totalItemsToFetch = 100;
 
   useEffect(() => {
     fetchProducts();
+    fetchTrendingProducts();
     if (isLoggedIn && user?.id) {
       fetchUserWishlist();
     }
+
+    // Auto-rotate banners
+    const bannerInterval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => clearInterval(bannerInterval);
   }, [isLoggedIn, user]);
 
   const fetchProducts = async () => {
@@ -75,6 +125,51 @@ const HomePage = () => {
       }
     } catch (error) {
       console.error("Error fetching batch reviews:", error);
+    }
+  };
+
+  const fetchTrendingProducts = async () => {
+    try {
+      setTrendingLoading(true);
+      // Fetch all products to get review stats
+      const response = await catalogueAPI.filterProducts({
+        limit: 200,
+        offset: 0,
+      });
+      const fetchedProducts = response.data || [];
+
+      // Fetch review stats for all products
+      if (fetchedProducts.length > 0) {
+        const itemIds = fetchedProducts.map((p: Product) => p.id);
+        const reviewResponse = await reviewAPI.getBatchReviewStats(itemIds);
+
+        if (reviewResponse.success && reviewResponse.data) {
+          // Sort products by average rating (descending)
+          const sortedProducts = fetchedProducts
+            .map((product: Product) => ({
+              ...product,
+              rating: reviewResponse.data![product.id]?.averageRating || 0,
+              reviewCount: reviewResponse.data![product.id]?.totalReviews || 0,
+            }))
+            .sort((a: any, b: any) => {
+              // Sort by average rating first, then by number of reviews
+              if (b.rating !== a.rating) {
+                return b.rating - a.rating;
+              }
+              return b.reviewCount - a.reviewCount;
+            })
+            .slice(0, 8); // Get top 10
+
+          setTrendingProducts(sortedProducts);
+
+          // Update review ratings
+          setReviewRatings(reviewResponse.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching trending products:", error);
+    } finally {
+      setTrendingLoading(false);
     }
   };
 
@@ -168,9 +263,229 @@ const HomePage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleBannerNext = () => {
+    setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+  };
+
+  const handleBannerPrev = () => {
+    setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
+  const goToBanner = (index: number) => {
+    setCurrentBannerIndex(index);
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ToastContainer />
+
+      {/* Banner Carousel */}
+      <div className="relative w-full bg-black overflow-hidden">
+        <div className="relative h-64 sm:h-80 lg:h-96 w-full">
+          {/* Banners */}
+          {banners.map((banner, index) => (
+            <div
+              key={banner.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentBannerIndex ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={banner.image}
+                alt={banner.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src =
+                    "https://images.unsplash.com/photo-1557821552-17105176677c?w=1200&h=400&fit=crop";
+                }}
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-center items-start px-4 sm:px-8 lg:px-16">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-4">
+                  {banner.title}
+                </h2>
+                {banner.subtitle && (
+                  <p className="text-lg sm:text-xl text-gray-200 mb-4 sm:mb-6">
+                    {banner.subtitle}
+                  </p>
+                )}
+                {banner.link && (
+                  <button
+                    onClick={() => router.push(banner.link!)}
+                    className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 sm:px-8 py-2 sm:py-3 transition-colors"
+                  >
+                    Shop Now
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* Previous Button */}
+          <button
+            onClick={handleBannerPrev}
+            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 text-black p-2 sm:p-3 z-10 transition-all"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          {/* Next Button */}
+          <button
+            onClick={handleBannerNext}
+            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 text-black p-2 sm:p-3 z-10 transition-all"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          {/* Indicator Dots */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+            {banners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToBanner(index)}
+                className={`w-2 sm:w-3 h-2 sm:h-3 rounded-full transition-all ${
+                  index === currentBannerIndex
+                    ? "bg-orange-500 w-6 sm:w-8"
+                    : "bg-white bg-opacity-50 hover:bg-opacity-75"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top Trending Section */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-16 w-full">
+        <div className="flex justify-between items-center mb-6 sm:mb-10">
+          <div>
+            <h2 className="text-2xl sm:text-4xl font-black text-black mb-2">
+              Top Trending
+            </h2>
+            <p className="text-gray-600">
+              Best reviewed products loved by customers
+            </p>
+          </div>
+        </div>
+
+        {trendingLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div
+                key={index}
+                className="bg-white border-2 border-gray-200 p-4 animate-pulse"
+              >
+                <div className="w-full h-48 bg-gray-200 mb-4"></div>
+                <div className="h-4 bg-gray-200 mb-2"></div>
+                <div className="h-4 bg-gray-200 w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        ) : trendingProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 text-lg">
+              No trending products available
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            {trendingProducts.map((product) => {
+              const isInWishlist = wishlistedItems.has(product.id);
+              const isTogglingThis = togglingWishlist === product.id;
+              const reviewData = reviewRatings[product.id];
+              const rating = reviewData?.averageRating || 0;
+              const reviewCount = reviewData?.totalReviews || 0;
+
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white border-2 border-black hover:border-gray-600 transition-all duration-300 overflow-hidden group relative min-w-0 w-full"
+                >
+                  <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <img
+                      src={product.image_url || "/placeholder-product.png"}
+                      alt={product.title}
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 cursor-pointer p-1 sm:p-2"
+                      onClick={() => router.push(`/products/${product.id}`)}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder-product.png";
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-600 text-white px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-bold">
+                      ⭐ TRENDING
+                    </div>
+                    {/* Wishlist Button */}
+                    <button
+                      onClick={() => handleToggleWishlist(product.id)}
+                      disabled={isTogglingThis}
+                      className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white hover:bg-gray-100 p-1.5 sm:p-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                      title={
+                        isInWishlist
+                          ? "Remove from wishlist"
+                          : "Add to wishlist"
+                      }
+                    >
+                      <Heart
+                        size={18}
+                        className={`sm:w-5 sm:h-5 transition-all duration-300 ${
+                          isInWishlist
+                            ? "fill-red-500 text-red-500"
+                            : "fill-none text-black"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="p-3 sm:p-5">
+                    <h3
+                      className="text-base sm:text-lg font-bold text-black mb-2 sm:mb-3 line-clamp-2 group-hover:text-gray-600 transition-colors cursor-pointer break-words"
+                      title={product.title}
+                      onClick={() => router.push(`/products/${product.id}`)}
+                    >
+                      {product.title}
+                    </h3>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4">
+                      <div className="min-w-0">
+                        <span className="text-xl sm:text-2xl lg:text-3xl font-black text-black break-words">
+                          {product.currency} {product.price_LKR.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between text-sm gap-2 mb-3 sm:mb-4">
+                      <span className="bg-gray-100 text-black px-2 sm:px-3 py-1 font-semibold text-xs border border-black whitespace-nowrap">
+                        {product.website}
+                      </span>
+                      <span className="text-black font-semibold whitespace-nowrap">
+                        ⭐ {rating.toFixed(1)}
+                        {reviewCount > 0 && (
+                          <span className="text-gray-600 text-xs ml-1">
+                            ({reviewCount})
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 min-w-0">
+                      <button
+                        onClick={() => router.push(`/products/${product.id}`)}
+                        className="flex-1 min-w-0 bg-black text-white text-center py-2 sm:py-3 hover:bg-gray-800 transition-colors font-bold text-xs sm:text-sm lg:text-base"
+                      >
+                        View Product
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        disabled={addingToCart === product.id}
+                        className="flex-shrink-0 bg-white text-black border-2 border-black px-2 sm:px-3 lg:px-5 py-2 sm:py-3 hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                      >
+                        {addingToCart === product.id ? "..." : "🛒"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Products Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-16 flex-grow">
         <div className="flex justify-between items-center mb-6 sm:mb-10">

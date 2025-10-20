@@ -63,7 +63,10 @@ const OrdersPage = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
 
   // Toast state
-  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: ToastType;
+  } | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -201,13 +204,22 @@ const OrdersPage = () => {
           new Set(prev).add(reviewModal.order!.orderId)
         );
         closeReviewModal();
-        setToast({ message: "Review submitted successfully!", type: "success" });
+        setToast({
+          message: "Review submitted successfully!",
+          type: "success",
+        });
       } else {
-        setToast({ message: "Failed to submit review. Please try again.", type: "error" });
+        setToast({
+          message: "Failed to submit review. Please try again.",
+          type: "error",
+        });
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      setToast({ message: "Failed to submit review. Please try again.", type: "error" });
+      setToast({
+        message: "Failed to submit review. Please try again.",
+        type: "error",
+      });
     } finally {
       setSubmittingReview(false);
     }
@@ -312,9 +324,7 @@ const OrdersPage = () => {
                             href={`/products/${item.itemId}`}
                             className="block"
                           >
-                            <div
-                              className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
-                            >
+                            <div className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors">
                               <div>
                                 <p className="font-semibold">
                                   {item.productName}

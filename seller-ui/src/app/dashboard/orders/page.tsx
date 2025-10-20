@@ -57,7 +57,10 @@ export default function OrdersPage() {
   const [shopWebsite, setShopWebsite] = useState<string | null>(null);
 
   // Toast state
-  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: ToastType;
+  } | null>(null);
 
   // Fetch shop website first
   useEffect(() => {
@@ -174,9 +177,15 @@ export default function OrdersPage() {
         if (selectedOrder?.orderId === orderId) {
           setSelectedOrder({ ...selectedOrder, ...status });
         }
-        setToast({ message: "Order status updated successfully!", type: "success" });
+        setToast({
+          message: "Order status updated successfully!",
+          type: "success",
+        });
       } else {
-        setToast({ message: data.message || "Failed to update order status", type: "error" });
+        setToast({
+          message: data.message || "Failed to update order status",
+          type: "error",
+        });
       }
     } catch (error) {
       console.error("Error updating order status:", error);
