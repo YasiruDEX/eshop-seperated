@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_GATEWAY_URL": "https://your-api-gateway-url.onrender.com"
+  }
+}
