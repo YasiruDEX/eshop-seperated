@@ -16,7 +16,7 @@ import {
 import { useToast } from "../../shared/hooks/useToast";
 
 export default function ProfilePage() {
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { success, error: showError, ToastContainer } = useToast();
   const [loading, setLoading] = useState(true);
@@ -51,6 +51,11 @@ export default function ProfilePage() {
   const [memberships, setMemberships] = useState<string>("");
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking login status
+    if (authLoading) {
+      return;
+    }
+
     if (!isLoggedIn) {
       router.push("/login");
       return;
@@ -59,7 +64,7 @@ export default function ProfilePage() {
     if (user?.id) {
       fetchProfile();
     }
-  }, [isLoggedIn, user]);
+  }, [authLoading, isLoggedIn, user]);
 
   const fetchProfile = async () => {
     try {

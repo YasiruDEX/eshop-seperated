@@ -19,7 +19,7 @@ interface CartItemWithProduct {
 }
 
 const CartPage = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
@@ -35,12 +35,17 @@ const CartPage = () => {
   });
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking login status
+    if (authLoading) {
+      return;
+    }
+
     if (!isLoggedIn || !user?.id) {
       router.push("/login");
       return;
     }
     fetchCart();
-  }, [isLoggedIn, user]);
+  }, [authLoading, isLoggedIn, user]);
 
   const fetchCart = async () => {
     if (!user?.id) return;

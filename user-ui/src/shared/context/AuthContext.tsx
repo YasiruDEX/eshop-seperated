@@ -12,6 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: User | null) => void;
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in (check localStorage)
@@ -38,6 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("user");
       }
     }
+    // Mark loading as complete after checking localStorage
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -64,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, isLoading, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

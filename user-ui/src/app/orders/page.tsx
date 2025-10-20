@@ -45,7 +45,7 @@ interface Order {
 }
 
 const OrdersPage = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +69,11 @@ const OrdersPage = () => {
   } | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking login status
+    if (authLoading) {
+      return;
+    }
+
     if (!isLoggedIn) {
       router.push("/login");
       return;
@@ -77,7 +82,7 @@ const OrdersPage = () => {
     if (user?.id) {
       fetchOrders();
     }
-  }, [isLoggedIn, user]);
+  }, [authLoading, isLoggedIn, user]);
 
   useEffect(() => {
     if (orders.length > 0) {

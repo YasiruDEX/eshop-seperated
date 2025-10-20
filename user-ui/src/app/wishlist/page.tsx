@@ -27,7 +27,7 @@ interface Product {
 }
 
 const WishlistPage = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, isLoading: authLoading } = useAuth();
   const { wishlistCount, refreshWishlistCount, removeFromWishlist } =
     useWishlist();
   const { success, error: showError, ToastContainer } = useToast();
@@ -40,6 +40,11 @@ const WishlistPage = () => {
   const [addingToCartId, setAddingToCartId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking login status
+    if (authLoading) {
+      return;
+    }
+
     if (!isLoggedIn) {
       router.push("/login");
       return;
@@ -48,7 +53,7 @@ const WishlistPage = () => {
     if (user?.id) {
       fetchWishlist();
     }
-  }, [isLoggedIn, user]);
+  }, [authLoading, isLoggedIn, user]);
 
   const fetchWishlist = async () => {
     try {

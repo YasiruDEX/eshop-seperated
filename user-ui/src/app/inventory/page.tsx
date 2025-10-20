@@ -41,7 +41,7 @@ const UNIT_OPTIONS = [
 ];
 
 const InventoryPage = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { success, error: showError, ToastContainer } = useToast();
 
@@ -59,6 +59,11 @@ const InventoryPage = () => {
   });
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking login status
+    if (authLoading) {
+      return;
+    }
+
     if (!isLoggedIn) {
       router.push("/login");
       return;
@@ -67,7 +72,7 @@ const InventoryPage = () => {
     if (user?.id) {
       fetchInventory();
     }
-  }, [isLoggedIn, user]);
+  }, [authLoading, isLoggedIn, user]);
 
   const fetchInventory = async () => {
     try {
