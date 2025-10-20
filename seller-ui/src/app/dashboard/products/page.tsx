@@ -38,6 +38,7 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [shopName, setShopName] = useState<string>("");
   const [shopWebsite, setShopWebsite] = useState<string>("");
 
   const [formData, setFormData] = useState({
@@ -71,37 +72,61 @@ export default function ProductsPage() {
 
   const fetchShopInfo = async () => {
     try {
-      if (!seller?.id) return;
+      if (!seller?.id) {
+        console.warn("No seller ID available");
+        return;
+      }
+      console.log("Fetching shop info for seller:", seller.id);
       const response = await sellerAPI.getSellerShop(seller.id);
-      if (response.success && response.data?.website) {
-        setShopWebsite(response.data.website);
+      console.log("Shop info response:", response);
+
+      // The API returns { success, seller, shop } structure
+      if (response.success && response.shop?.website) {
+        console.log("Shop website found:", response.shop.website);
+        setShopName(response.shop.name); // Keep for display
+        setShopWebsite(response.shop.website); // Use for filtering
+      } else {
+        console.warn(
+          "No shop website found in shop data. Response structure:",
+          response
+        );
+        setError("Please set up your shop first in Store Settings");
       }
     } catch (err: any) {
       console.error("Error fetching shop info:", err);
+      setError("Failed to load shop information");
     }
   };
 
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
+      setError("");
 
       if (!shopWebsite) {
-        setError("Please set up your shop website first in Store Settings");
+        console.warn("Shop website not set");
+        setError("Please set up your shop first in Store Settings");
         setProducts([]);
         setIsLoading(false);
         return;
       }
 
-      // Filter products by the seller's shop website
+      console.log("Fetching products for shop website:", shopWebsite);
+      // Filter products by matching the shop's website
       const response = await catalogueAPI.filterProducts({
-        website: shopWebsite,
+        website: shopWebsite, // Match by website
         limit: 100,
       });
 
+      console.log("Products response:", response);
       setProducts(response.data || []);
+
+      if (!response.data || response.data.length === 0) {
+        console.log("No products found for this shop website");
+      }
     } catch (err: any) {
       console.error("Error fetching products:", err);
-      setError("Failed to load products");
+      setError(err.response?.data?.error || "Failed to load products");
     } finally {
       setIsLoading(false);
     }
@@ -114,22 +139,25 @@ export default function ProductsPage() {
     }
 
     if (!shopWebsite) {
-      setError("Please set up your shop website first in Store Settings");
+      setError("Please set up your shop first in Store Settings");
       return;
     }
 
     try {
       setIsLoading(true);
-      // Search with website filter
+      setError("");
+      console.log("Searching products:", { shopWebsite, searchTerm });
+      // Search with shop website filter
       const response = await catalogueAPI.filterProducts({
-        website: shopWebsite,
+        website: shopWebsite, // Match by website
         searchTerm: searchTerm,
         limit: 100,
       });
+      console.log("Search response:", response);
       setProducts(response.data || []);
     } catch (err: any) {
       console.error("Error searching products:", err);
-      setError("Failed to search products");
+      setError(err.response?.data?.error || "Failed to search products");
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +191,7 @@ export default function ProductsPage() {
     }
 
     if (!shopWebsite) {
-      setError("Please set up your shop website first in Store Settings");
+      setError("Please set up your shop first in Store Settings");
       return;
     }
 
@@ -174,12 +202,14 @@ export default function ProductsPage() {
         image_url: formData.image_url || undefined,
         currency: formData.currency,
         source_url: formData.source_url || undefined,
-        website: shopWebsite, // Automatically set to seller's shop website
+        website: shopWebsite, // Match by shop's website
         source_domain: formData.source_domain || undefined,
       };
 
+      console.log("Adding product:", productData);
       const response = await catalogueAPI.addProduct(productData);
 
+      console.log("Add product response:", response);
       if (response.success) {
         setSuccess("Product added successfully!");
         setShowAddModal(false);
@@ -223,7 +253,7 @@ export default function ProductsPage() {
               {shopWebsite && (
                 <p className="text-sm text-gray-600 mt-1">
                   <Globe size={14} className="inline mr-1" />
-                  Store: {shopWebsite}
+                  Store: {shopName}
                 </p>
               )}
             </div>
@@ -236,7 +266,7 @@ export default function ProductsPage() {
                 ? "bg-black text-white hover:bg-gray-800"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
-            title={!shopWebsite ? "Please set up your shop website first" : ""}
+            title={!shopWebsite ? "Please set up your shop first" : ""}
           >
             <Plus size={20} />
             Add Product

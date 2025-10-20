@@ -1,0 +1,25 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../../generated/prisma-messaging"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("COMMUNICATION_DATABASE_URL")
+}
+
+model messaging {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId     String   @db.ObjectId // User sending/receiving the message
+    sellerId   String   @db.ObjectId // Seller sending/receiving the message
+    senderId   String   @db.ObjectId // Who sent this message (userId or sellerId)
+    senderType String // "user" or "seller"
+    message    String // Message content
+    isRead     Boolean  @default(false) // Whether the message has been read
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@index([userId, sellerId])
+    @@index([senderId])
+    @@map("messaging")
+}

@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../generated/prisma-review"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("REVIEWS_DATABASE_URL")
+}
+
+model comments {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  itemId    String   @db.ObjectId // Product ID being reviewed
+  orderId   String? // Optional: Order ID if review is from verified purchase
+  userId    String?  @db.ObjectId // User who wrote the review
+  userName  String? // Name of the reviewer
+  userEmail String? // Email of the reviewer
+  rating    Int // Rating out of 5 (1-5)
+  comment   String // Review text
+  helpful   Int      @default(0) // Number of people who found this helpful
+  verified  Boolean  @default(false) // Is this a verified purchase
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([itemId])
+  @@index([orderId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model catalogue {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String?
+  description   String?
+  price         Float?
+  currency      String?
+  availability  String?
+  images        Json?
+  reviewCount   Int      @default(0) // Total number of reviews
+  averageRating Float    @default(0) // Average rating out of 5
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("catalogue")
+}

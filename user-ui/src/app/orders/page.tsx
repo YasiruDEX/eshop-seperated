@@ -10,9 +10,11 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { reviewAPI } from "../../shared/utils/reviewAPI";
 
 interface OrderItem {
   itemId: string;
@@ -49,6 +51,15 @@ const OrdersPage = () => {
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+  const [reviewedOrders, setReviewedOrders] = useState<Set<string>>(new Set());
+  const [reviewModal, setReviewModal] = useState<{
+    open: boolean;
+    order: Order | null;
+    item: OrderItem | null;
+  }>({ open: false, order: null, item: null });
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -60,6 +71,31 @@ const OrdersPage = () => {
       fetchOrders();
     }
   }, [isLoggedIn, user]);
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      checkReviewedOrders();
+    }
+  }, [orders]);
+
+  const checkReviewedOrders = async () => {
+    const reviewed = new Set<string>();
+    for (const order of orders) {
+      try {
+        const response = await reviewAPI.getReviewsByOrderId(order.orderId);
+        if (response.success && response.data && response.data.length > 0) {
+          reviewed.add(order.orderId);
+        }
+      } catch (error) {
+        console.error(
+          "Error checking reviews for order:",
+          order.orderId,
+          error
+        );
+      }
+    }
+    setReviewedOrders(reviewed);
+  };
 
   const fetchOrders = async () => {
     try {
@@ -125,6 +161,52 @@ const OrdersPage = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openReviewModal = (order: Order, item: OrderItem) => {
+    setReviewModal({ open: true, order, item });
+    setReviewRating(5);
+    setReviewComment("");
+  };
+
+  const closeReviewModal = () => {
+    setReviewModal({ open: false, order: null, item: null });
+    setReviewRating(5);
+    setReviewComment("");
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewModal.order || !reviewModal.item || !user) return;
+
+    try {
+      setSubmittingReview(true);
+      const response = await reviewAPI.submitReview({
+        itemId: reviewModal.item.itemId,
+        orderId: reviewModal.order.orderId,
+        userId: user.id,
+        userName: user.name || "Anonymous",
+        userEmail: user.email || "",
+        rating: reviewRating,
+        comment: reviewComment,
+        verified: true,
+      });
+
+      if (response.success) {
+        // Add to reviewed orders
+        setReviewedOrders((prev) =>
+          new Set(prev).add(reviewModal.order!.orderId)
+        );
+        closeReviewModal();
+        alert("Review submitted successfully!");
+      } else {
+        alert("Failed to submit review. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   if (loading) {
@@ -235,38 +317,66 @@ const OrdersPage = () => {
                     </div>
 
                     {/* Total and Status */}
-                    <div className="flex justify-between items-center pt-4 border-t-2 border-black">
-                      <div className="flex items-center gap-4">
-                        {/* Confirmation Status */}
-                        <div
-                          className={`px-3 py-1 border-2 font-bold text-sm ${
-                            order.confirmed
-                              ? "bg-green-100 text-green-800 border-green-800"
-                              : "bg-gray-100 text-gray-800 border-gray-800"
-                          }`}
-                        >
-                          {order.confirmed
-                            ? "✓ Confirmed"
-                            : "⏳ Pending Confirmation"}
+                    <div className="flex flex-col gap-4 pt-4 border-t-2 border-black">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                          {/* Confirmation Status */}
+                          <div
+                            className={`px-3 py-1 border-2 font-bold text-sm ${
+                              order.confirmed
+                                ? "bg-green-100 text-green-800 border-green-800"
+                                : "bg-gray-100 text-gray-800 border-gray-800"
+                            }`}
+                          >
+                            {order.confirmed
+                              ? "✓ Confirmed"
+                              : "⏳ Pending Confirmation"}
+                          </div>
+
+                          {/* Delivery Status */}
+                          <div
+                            className={`px-3 py-1 border-2 font-bold text-sm flex items-center gap-2 ${getDeliveryStatusColor(
+                              order.deliveryStatus
+                            )}`}
+                          >
+                            {getDeliveryStatusIcon(order.deliveryStatus)}
+                            {getDeliveryStatusText(order.deliveryStatus)}
+                          </div>
                         </div>
 
-                        {/* Delivery Status */}
-                        <div
-                          className={`px-3 py-1 border-2 font-bold text-sm flex items-center gap-2 ${getDeliveryStatusColor(
-                            order.deliveryStatus
-                          )}`}
-                        >
-                          {getDeliveryStatusIcon(order.deliveryStatus)}
-                          {getDeliveryStatusText(order.deliveryStatus)}
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600">Total Amount</p>
+                          <p className="text-2xl font-black text-black">
+                            LKR {order.totalAmount.toFixed(2)}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">Total Amount</p>
-                        <p className="text-2xl font-black text-black">
-                          LKR {order.totalAmount.toFixed(2)}
-                        </p>
-                      </div>
+                      {/* Review Button for Delivered Orders */}
+                      {order.deliveryStatus === "delivered" &&
+                        !reviewedOrders.has(order.orderId) && (
+                          <div className="flex gap-2 flex-wrap">
+                            {order.items.map((item, index) => (
+                              <button
+                                key={index}
+                                onClick={() => openReviewModal(order, item)}
+                                className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white font-bold hover:bg-yellow-600 transition-colors"
+                              >
+                                <Star size={16} />
+                                Write Review for {item.productName}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                      {order.deliveryStatus === "delivered" &&
+                        reviewedOrders.has(order.orderId) && (
+                          <div className="bg-gray-50 border-2 border-dashed border-gray-300 px-4 py-2">
+                            <p className="text-gray-600 text-sm">
+                              ✓ You have already reviewed this order
+                            </p>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -327,6 +437,89 @@ const OrdersPage = () => {
           </>
         )}
       </div>
+
+      {/* Review Modal */}
+      {reviewModal.open && reviewModal.order && reviewModal.item && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-4 border-black max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-black text-white p-4 flex justify-between items-center">
+              <h3 className="font-black text-xl">Write a Review</h3>
+              <button
+                onClick={closeReviewModal}
+                className="text-white hover:text-gray-300"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Reviewing</p>
+                <p className="font-bold text-lg">
+                  {reviewModal.item.productName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Order: {reviewModal.order.orderId}
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">
+                  Rating <span className="text-red-600">*</span>
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setReviewRating(star)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        size={32}
+                        className={`${
+                          star <= reviewRating
+                            ? "fill-yellow-500 text-yellow-500"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">
+                  Your Review <span className="text-red-600">*</span>
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share your experience with this product..."
+                  rows={5}
+                  className="w-full border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-black"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSubmitReview}
+                  disabled={!reviewComment.trim() || submittingReview}
+                  className="flex-1 bg-black text-white py-3 font-bold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {submittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+                <button
+                  onClick={closeReviewModal}
+                  className="px-6 bg-white text-black border-2 border-black py-3 font-bold hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-black text-white border-t-4 border-black mt-16">

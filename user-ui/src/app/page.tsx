@@ -8,6 +8,7 @@ import {
   wishlistAPI,
   Product,
 } from "../shared/utils/api";
+import { reviewAPI } from "../shared/utils/reviewAPI";
 import { useAuth } from "../shared/context/AuthContext";
 import { useWishlist } from "../shared/context/WishlistContext";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,9 @@ const HomePage = () => {
     new Set()
   );
   const [togglingWishlist, setTogglingWishlist] = useState<string | null>(null);
+  const [reviewRatings, setReviewRatings] = useState<
+    Record<string, { averageRating: number; totalReviews: number }>
+  >({});
   const itemsPerPage = 24;
   const totalItemsToFetch = 100;
 
@@ -46,13 +50,31 @@ const HomePage = () => {
         limit: totalItemsToFetch,
         offset: 0,
       });
-      setProducts(response.data || []);
-      setTotalProducts(response.data?.length || 0);
+      const fetchedProducts = response.data || [];
+      setProducts(fetchedProducts);
+      setTotalProducts(fetchedProducts.length);
+
+      // Fetch batch reviews for all products
+      if (fetchedProducts.length > 0) {
+        const itemIds = fetchedProducts.map((p: Product) => p.id);
+        fetchBatchReviews(itemIds);
+      }
     } catch (error: any) {
       console.error("Error fetching products:", error);
       setError("Failed to load products");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBatchReviews = async (itemIds: string[]) => {
+    try {
+      const response = await reviewAPI.getBatchReviewStats(itemIds);
+      if (response.success && response.data) {
+        setReviewRatings(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching batch reviews:", error);
     }
   };
 
@@ -199,6 +221,9 @@ const HomePage = () => {
             {paginatedProducts.map((product) => {
               const isInWishlist = wishlistedItems.has(product.id);
               const isTogglingThis = togglingWishlist === product.id;
+              const reviewData = reviewRatings[product.id];
+              const rating = reviewData?.averageRating || 0;
+              const reviewCount = reviewData?.totalReviews || 0;
 
               return (
                 <div
@@ -260,7 +285,12 @@ const HomePage = () => {
                         {product.website}
                       </span>
                       <span className="text-black font-semibold whitespace-nowrap">
-                        ⭐ 4.5
+                        ⭐ {rating.toFixed(1)}
+                        {reviewCount > 0 && (
+                          <span className="text-gray-600 text-xs ml-1">
+                            ({reviewCount})
+                          </span>
+                        )}
                       </span>
                     </div>
                     <div className="flex gap-2 min-w-0">

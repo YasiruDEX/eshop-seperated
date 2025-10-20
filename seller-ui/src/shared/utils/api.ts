@@ -143,28 +143,30 @@ export const catalogueAPI = {
     website?: string;
     source_domain?: string;
   }) => {
-    const catalogueUrl = "http://localhost:8080/catalogue";
-    const response = await axios.post(`${catalogueUrl}/add`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return response.data;
+    const response = await api.post("/catalogue/add", data);
+    return {
+      success: response.data.success,
+      data: response.data.data,
+    };
   },
 
   getAllProducts: async () => {
-    const catalogueUrl = "http://localhost:8080/catalogue";
-    const response = await axios.get(catalogueUrl);
-    return response.data;
+    const response = await api.get("/catalogue");
+    return {
+      success: response.data.success,
+      data: response.data.data,
+    };
   },
 
   searchProducts: async (searchTerm: string, limit: number = 10) => {
-    const catalogueUrl = "http://localhost:8080/catalogue";
-    const response = await axios.post(`${catalogueUrl}/search`, {
+    const response = await api.post("/catalogue/search", {
       searchTerm,
       limit,
     });
-    return response.data;
+    return {
+      success: response.data.success,
+      data: response.data.data,
+    };
   },
 
   filterProducts: async (filters: {
@@ -176,9 +178,11 @@ export const catalogueAPI = {
     limit?: number;
     offset?: number;
   }) => {
-    const catalogueUrl = "http://localhost:8080/catalogue";
-    const response = await axios.post(`${catalogueUrl}/filter`, filters);
-    return response.data;
+    const response = await api.post("/catalogue/filter", filters);
+    return {
+      success: response.data.success,
+      data: response.data.data,
+    };
   },
 };
 

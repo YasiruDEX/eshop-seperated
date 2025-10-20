@@ -1,0 +1,42 @@
+{
+  "name": "messaging-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/messaging-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/messaging-service",
+        "main": "apps/messaging-service/src/main.ts",
+        "tsConfig": "apps/messaging-service/tsconfig.app.json",
+        "webpackConfig": "apps/messaging-service/webpack.config.js",
+        "assets": []
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "messaging-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "messaging-service:build:development"
+        },
+        "production": {
+          "buildTarget": "messaging-service:build:production"
+        }
+      }
+    }
+  }
+}

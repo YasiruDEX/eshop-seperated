@@ -1,0 +1,44 @@
+{
+  "name": "@auth-service/notification-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/notification-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/notification-service",
+        "main": "apps/notification-service/src/main.ts",
+        "tsConfig": "apps/notification-service/tsconfig.app.json",
+        "webpackConfig": "apps/notification-service/webpack.config.js",
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "@auth-service/notification-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@auth-service/notification-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@auth-service/notification-service:build:production"
+        }
+      }
+    }
+  }
+}

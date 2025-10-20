@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Added to Wishlist</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .item-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .item-card h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 22px;
+        }
+        .item-card p {
+            margin: 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .icon {
+            font-size: 64px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .message {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+        .features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .features li {
+            padding: 8px 0;
+            color: #555;
+        }
+        .features li:before {
+            content: "💝 ";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❤️ Added to Wishlist!</h1>
+            <p>We've saved this item for you</p>
+        </div>
+        <div class="content">
+            <div class="icon">🌟</div>
+            <p class="message">
+                Hi there! 👋
+            </p>
+            <p class="message">
+                Great choice! We've added this item to your wishlist so you can easily find it later.
+            </p>
+            <div class="item-card">
+                <h2>{{ITEM_NAME}}</h2>
+                <p>Now saved in your wishlist</p>
+            </div>
+            <div class="features">
+                <h3 style="margin: 0 0 15px 0; color: #333;">Your Wishlist Benefits:</h3>
+                <ul>
+                    <li>Get notified when prices drop</li>
+                    <li>Never lose track of items you love</li>
+                    <li>Easy checkout when you're ready</li>
+                    <li>Share your wishlist with friends & family</li>
+                </ul>
+            </div>
+            <div style="text-align: center;">
+                <a href="#" class="button">View My Wishlist</a>
+            </div>
+            <p class="message" style="margin-top: 30px; text-align: center;">
+                <strong>💡 Pro Tip:</strong> Items in your wishlist can sell out fast!<br>
+                Check back regularly or enable price alerts.
+            </p>
+        </div>
+        <div class="footer">
+            <p><strong>E-Shop</strong></p>
+            <p>Questions? Contact us at support@eshop.com</p>
+            <p style="margin-top: 15px; color: #999; font-size: 12px;">
+                This is an automated email. Please do not reply to this message.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

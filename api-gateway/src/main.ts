@@ -3,6 +3,10 @@
  * This is only a minimal backend to get started.
  */
 
+// Load environment variables from .env file
+import dotenv from "dotenv";
+dotenv.config();
+
 // Disable SSL verification for development (needed for Render proxy)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -16,6 +20,32 @@ import axios from "axios";
 import cookieParser from "cookie-parser";
 
 const app = express();
+
+// Get service URLs from environment variables
+const AUTH_SERVICE_URL =
+  process.env.AUTH_SERVICE_URL || "https://eshop-auth-uq9z.onrender.com";
+const CATALOGUE_SERVICE_URL =
+  process.env.CATALOGUE_SERVICE_URL || "https://eshop-catalogue.onrender.co";
+const REVIEW_SERVICE_URL =
+  process.env.REVIEW_SERVICE_URL || "http://localhost:6005";
+const NOTIFICATION_SERVICE_URL =
+  process.env.NOTIFICATION_SERVICE_URL || "http://localhost:6003";
+const PAYMENT_SERVICE_URL =
+  process.env.PAYMENT_SERVICE_URL || "https://eshop-seperated.onrender.com";
+const INVENTORY_SERVICE_URL =
+  process.env.INVENTORY_SERVICE_URL || "https://eshop-inventory.onrender.com";
+const MESSAGING_SERVICE_URL =
+  process.env.MESSAGING_SERVICE_URL || "http://localhost:6007";
+const CHECKOUT_SERVICE_URL =
+  process.env.CHECKOUT_SERVICE_URL || "https://eshop-checkout.onrender.com";
+const ORDER_SERVICE_URL =
+  process.env.ORDER_SERVICE_URL || "https://eshop-orders.onrender.com";
+const CUSTOMER_SERVICE_URL =
+  process.env.CUSTOMER_SERVICE_URL ||
+  "https://eshop-customer-880k.onrender.com";
+const AI_SEARCH_SERVICE_URL =
+  process.env.AI_SEARCH_SERVICE_URL ||
+  "https://0f195hsk-3004.inc1.devtunnels.ms";
 
 // Configure CORS origins from environment variable or sensible defaults
 const envOrigins = process.env.CORS_ALLOWED_ORIGINS || "";
@@ -86,10 +116,13 @@ app.get("/gateway-health", (req, res) => {
   res.send({ message: "Welcome to api-gateway!" });
 });
 
-// Specific routes first (before /api wildcard)
-app.use(
+// Create an Express router for API routes
+const apiRouter = express.Router();
+
+// Specific routes first (before wildcard)
+apiRouter.use(
   "/auth",
-  proxy("https://eshop-auth-uq9z.onrender.com", {
+  proxy(AUTH_SERVICE_URL, {
     https: true,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
@@ -107,81 +140,101 @@ app.use(
       return proxyResData;
     },
   })
-); // Backwards compatibility
-app.use(
+); // Auth Service
+apiRouter.use(
+  "/seller-shop",
+  proxy(AUTH_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/seller-shop${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      // Forward cookies from the original request
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      // Forward Set-Cookie headers from the proxied response
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+); // Seller Shop (Auth Service)
+apiRouter.use(
   "/catalogue",
-  proxy("https://eshop-catalogue.onrender.com", {
+  proxy(CATALOGUE_SERVICE_URL, {
     proxyReqPathResolver: (req) => {
-      // Map /catalogue/* to /products/*
-      // But if the path already starts with /products, don't add it again
+      // Map /api/catalogue/* to /products/*
       const path = req.url;
       const targetPath = path.startsWith("/products")
         ? path
         : `/products${path}`;
       console.log(
-        `[Catalogue Proxy] ${req.method} /catalogue${path} -> ${targetPath}`
+        `[Catalogue Proxy] ${req.method} /api/catalogue${path} -> ${targetPath}`
       );
       return targetPath;
     },
   })
 ); // Catalogue Service
-app.use(
+apiRouter.use(
   "/notifications",
-  proxy("http://localhost:6003", {
+  proxy(NOTIFICATION_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/notifications${req.url}`, // Preserve full path
   })
 ); // Notification Service
-app.use(
+apiRouter.use(
   "/payments",
-  proxy("https://eshop-seperated.onrender.com", {
+  proxy(PAYMENT_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/payments${req.url}`, // Preserve full path
   })
 ); // Payment Service
-app.use(
+apiRouter.use(
   "/reviews",
-  proxy("http://localhost:6005", {
+  proxy(REVIEW_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/reviews${req.url}`, // Preserve full path
   })
 ); // Review Service
-app.use(
+apiRouter.use(
   "/inventory",
-  proxy("https://eshop-inventory.onrender.com", {
+  proxy(INVENTORY_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/inventory${req.url}`, // Preserve full path
   })
 ); // Inventory Service
-app.use(
+apiRouter.use(
   "/messages",
-  proxy("http://localhost:6007", {
+  proxy(MESSAGING_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/messages${req.url}`, // Preserve full path
   })
 ); // Messaging Service
-app.use(
+apiRouter.use(
   "/cart",
-  proxy("https://eshop-checkout.onrender.com", {
+  proxy(CHECKOUT_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/cart${req.url}`, // Preserve full path
   })
 ); // Checkout Service
-app.use(
+apiRouter.use(
   "/wishlist",
-  proxy("https://eshop-checkout.onrender.com", {
+  proxy(CHECKOUT_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/wishlist${req.url}`, // Preserve full path
   })
 ); // Checkout Service - Wishlist
-app.use(
+apiRouter.use(
   "/orders",
-  proxy("https://eshop-orders.onrender.com", {
+  proxy(ORDER_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/orders${req.url}`, // Preserve full path
   })
 ); // Order Service
-app.use(
+apiRouter.use(
   "/profiles",
-  proxy("https://eshop-customer-880k.onrender.com", {
+  proxy(CUSTOMER_SERVICE_URL, {
     proxyReqPathResolver: (req) => `/api/profiles${req.url}`, // Map to customer service
   })
 ); // Customer Service
-app.use(
+apiRouter.use(
   "/ai-search",
-  proxy("https://0f195hsk-3004.inc1.devtunnels.ms", {
+  proxy(AI_SEARCH_SERVICE_URL, {
     https: true,
     proxyReqPathResolver: (req) => req.url,
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
@@ -200,29 +253,11 @@ app.use(
   })
 ); // AI Search Service
 
-// Route all /api/* requests to auth service
-app.use("/api", (req, res, next) => {
-  const proxyServer = proxy("https://eshop-auth-uq9z.onrender.com", {
-    proxyReqPathResolver: () => req.baseUrl + req.url,
-    https: true,
-    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-      // Forward cookies from the original request
-      if (srcReq.headers.cookie) {
-        proxyReqOpts.headers = proxyReqOpts.headers || {};
-        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
-      }
-      return proxyReqOpts;
-    },
-    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
-      // Forward Set-Cookie headers from the proxied response
-      if (proxyRes.headers["set-cookie"]) {
-        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
-      }
-      return proxyResData;
-    },
-  });
-  return proxyServer(req, res, next);
-});
+// Register the API router under /api prefix
+app.use("/api", apiRouter);
+
+// For backward compatibility, also mount routes at the root level
+app.use("/", apiRouter);
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {

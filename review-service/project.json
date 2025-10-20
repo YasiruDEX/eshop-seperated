@@ -1,0 +1,43 @@
+{
+  "name": "@review-service/review-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/review-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/review-service",
+        "main": "apps/review-service/src/main.ts",
+        "tsConfig": "apps/review-service/tsconfig.app.json",
+        "assets": [],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/review-service/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "@review-service/review-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@review-service/review-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@review-service/review-service:build:production"
+        }
+      }
+    }
+  }
+}
