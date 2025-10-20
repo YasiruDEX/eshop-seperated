@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Toast, { ToastType } from "../../../shared/components/Toast";
 import { useRouter } from "next/navigation";
 import {
   ShoppingBag,
@@ -53,11 +54,14 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [shopName, setShopName] = useState<string | null>(null);
+  const [shopWebsite, setShopWebsite] = useState<string | null>(null);
 
-  // Fetch shop name first
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+
+  // Fetch shop website first
   useEffect(() => {
-    const fetchShopName = async () => {
+    const fetchShopWebsite = async () => {
       if (!seller?.id) return;
 
       try {
@@ -69,7 +73,8 @@ export default function OrdersPage() {
         const data = await response.json();
 
         if (data.success && data.shop) {
-          setShopName(data.shop.name);
+          console.log("Shop info fetched:", data.shop);
+          setShopWebsite(data.shop.website);
         }
       } catch (error) {
         console.error("Error fetching shop:", error);
@@ -77,14 +82,14 @@ export default function OrdersPage() {
     };
 
     if (!authLoading) {
-      fetchShopName();
+      fetchShopWebsite();
     }
   }, [seller, authLoading]);
 
-  // Fetch orders for the shop by shop name
+  // Fetch orders for the shop by shop website
   useEffect(() => {
     const fetchOrders = async () => {
-      if (!shopName) return;
+      if (!shopWebsite) return;
 
       try {
         setIsLoading(true);
@@ -92,14 +97,16 @@ export default function OrdersPage() {
 
         const GATEWAY_URL =
           process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:8080";
-        // Encode shop name for URL
-        const encodedShopName = encodeURIComponent(shopName);
+        // Encode shop website for URL
+        const encodedShopWebsite = encodeURIComponent(shopWebsite);
+        console.log("Fetching orders for website:", shopWebsite);
         const response = await fetch(
-          `${GATEWAY_URL}/orders/shop-name/${encodedShopName}`
+          `${GATEWAY_URL}/orders/shop-name/${encodedShopWebsite}`
         );
         const data = await response.json();
 
         if (data.success) {
+          console.log("Orders fetched:", data.data.orders);
           setOrders(data.data.orders);
           setFilteredOrders(data.data.orders);
         } else {
@@ -114,7 +121,7 @@ export default function OrdersPage() {
     };
 
     fetchOrders();
-  }, [shopName]);
+  }, [shopWebsite]);
 
   // Filter orders based on search and status
   useEffect(() => {
@@ -167,13 +174,13 @@ export default function OrdersPage() {
         if (selectedOrder?.orderId === orderId) {
           setSelectedOrder({ ...selectedOrder, ...status });
         }
-        alert("Order status updated successfully!");
+        setToast({ message: "Order status updated successfully!", type: "success" });
       } else {
-        alert(data.message || "Failed to update order status");
+        setToast({ message: data.message || "Failed to update order status", type: "error" });
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      alert("Failed to update order status");
+      setToast({ message: "Failed to update order status", type: "error" });
     }
   };
 
@@ -220,6 +227,14 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      {/* Toast Popup */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <button
         onClick={() => router.push("/dashboard")}
         className="flex items-center gap-2 text-black hover:text-gray-600 mb-6 font-bold"

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Toast, { ToastType } from "../../shared/components/Toast";
 import Link from "next/link";
 import {
   Package,
@@ -60,6 +61,9 @@ const OrdersPage = () => {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -197,13 +201,13 @@ const OrdersPage = () => {
           new Set(prev).add(reviewModal.order!.orderId)
         );
         closeReviewModal();
-        alert("Review submitted successfully!");
+        setToast({ message: "Review submitted successfully!", type: "success" });
       } else {
-        alert("Failed to submit review. Please try again.");
+        setToast({ message: "Failed to submit review. Please try again.", type: "error" });
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review. Please try again.");
+      setToast({ message: "Failed to submit review. Please try again.", type: "error" });
     } finally {
       setSubmittingReview(false);
     }
@@ -222,6 +226,14 @@ const OrdersPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Toast Popup */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -295,23 +307,28 @@ const OrdersPage = () => {
                       <p className="font-bold text-sm mb-3">Items</p>
                       <div className="space-y-2">
                         {order.items.map((item, index) => (
-                          <div
+                          <Link
                             key={index}
-                            className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0"
+                            href={`/products/${item.itemId}`}
+                            className="block"
                           >
-                            <div>
-                              <p className="font-semibold">
-                                {item.productName}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Qty: {item.quantity} × LKR{" "}
-                                {item.price.toFixed(2)}
+                            <div
+                              className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                              <div>
+                                <p className="font-semibold">
+                                  {item.productName}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Qty: {item.quantity} × LKR{" "}
+                                  {item.price.toFixed(2)}
+                                </p>
+                              </div>
+                              <p className="font-bold">
+                                LKR {item.totalPrice.toFixed(2)}
                               </p>
                             </div>
-                            <p className="font-bold">
-                              LKR {item.totalPrice.toFixed(2)}
-                            </p>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </div>
