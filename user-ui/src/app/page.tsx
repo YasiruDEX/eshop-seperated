@@ -48,28 +48,32 @@ const HomePage = () => {
   const banners: Banner[] = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=400&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=400&fit=crop",
       title: "Summer Sale",
       subtitle: "Up to 70% OFF on selected items",
       link: "/products",
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=1200&h=400&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=1200&h=400&fit=crop",
       title: "Electronics Mega Sale",
       subtitle: "Best deals on gadgets and accessories",
       link: "/products",
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=1200&h=400&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=1200&h=400&fit=crop",
       title: "Fashion Collection",
       subtitle: "Trending styles for every occasion",
       link: "/products",
     },
     {
       id: 4,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop",
       title: "Premium Offers",
       subtitle: "Exclusive deals just for you",
       link: "/products",
@@ -268,7 +272,9 @@ const HomePage = () => {
   };
 
   const handleBannerPrev = () => {
-    setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+    setCurrentBannerIndex(
+      (prev) => (prev - 1 + banners.length) % banners.length
+    );
   };
 
   const goToBanner = (index: number) => {
