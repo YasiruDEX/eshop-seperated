@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../shared/context/AuthContext";
 import {
@@ -19,87 +19,301 @@ import {
   TrendingUp,
   DollarSign,
   ShoppingCart,
+  RefreshCw,
 } from "lucide-react";
 
-// Dummy sales data (in LKR)
-const salesData = [
-  { month: "Jun", revenue: 3750000, orders: 85 },
-  { month: "Jul", revenue: 4560000, orders: 102 },
-  { month: "Aug", revenue: 5670000, orders: 128 },
-  { month: "Sep", revenue: 5010000, orders: 115 },
-  { month: "Oct", revenue: 6390000, orders: 145 },
-  { month: "Nov", revenue: 5940000, orders: 132 },
-  { month: "Dec", revenue: 7350000, orders: 168 },
-  { month: "Jan", revenue: 6630000, orders: 151 },
-];
+interface OrderItem {
+  itemId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  totalPrice: number;
+}
 
-// Dummy top products (Sri Lankan products)
-const topProducts = [
-  {
-    id: 1,
-    name: "Maliban Cream Cracker 500g",
-    stock: "12,459 Units",
-    remaining: "435 Stocks Remaining",
-    available: true,
-  },
-  {
-    id: 2,
-    name: "Anchor Full Cream Milk Powder 1kg",
-    stock: "8,542 Units",
-    remaining: "278 Stocks Remaining",
-    available: true,
-  },
-  {
-    id: 3,
-    name: "MD Ceylon Tea 200g",
-    stock: "6,456 Units",
-    remaining: "405 Stocks Remaining",
-    available: true,
-  },
-];
+interface Order {
+  id: string;
+  orderId: string;
+  userId: string;
+  shopId: string;
+  shopName: string;
+  items: OrderItem[];
+  totalAmount: number;
+  currency: string;
+  confirmed: boolean;
+  deliveryStatus: string;
+  paymentId: string;
+  paymentStatus: string;
+  customerEmail: string;
+  customerName: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-// Dummy recent orders (LKR currency)
-const recentOrders = [
-  {
-    id: "#2456JL",
-    product: "Keells Basmati Rice 5kg",
-    date: "Jan 12, 12:23 pm",
-    price: "LKR 2,450.00",
-    payment: "Transfer",
-    status: "Processing",
-    statusColor: "text-blue-600 bg-blue-50",
-  },
-  {
-    id: "#5433DF",
-    product: "Maliban Gold Marie Biscuits",
-    date: "May 01, 01:13 pm",
-    price: "LKR 340.00",
-    payment: "Credit Card",
-    status: "Completed",
-    statusColor: "text-green-600 bg-green-50",
-  },
-  {
-    id: "#9876XC",
-    product: "Anchor Butter 200g",
-    date: "Sep 20, 09:08 am",
-    price: "LKR 1,280.00",
-    payment: "Transfer",
-    status: "Completed",
-    statusColor: "text-green-600 bg-green-50",
-  },
-];
+interface DashboardStats {
+  avgOrderValue: number;
+  totalOrders: number;
+  totalRevenue: number;
+  revenueChange: number;
+  ordersChange: number;
+}
+
+interface MonthlyData {
+  month: string;
+  revenue: number;
+  orders: number;
+}
+
+interface TopProduct {
+  productName: string;
+  totalQuantity: number;
+  totalRevenue: number;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoggedIn, logout, loading } = useAuth();
   const [activeMenuItem, setActiveMenuItem] = React.useState("overview");
   const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+  const [shopWebsite, setShopWebsite] = useState<string | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [stats, setStats] = useState<DashboardStats>({
+    avgOrderValue: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    revenueChange: 0,
+    ordersChange: 0,
+  });
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+  const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     if (!loading && !isLoggedIn) {
       router.push("/login");
     }
   }, [isLoggedIn, loading, router]);
+
+  // Fetch shop website
+  useEffect(() => {
+    const fetchShopWebsite = async () => {
+      if (!user?.id) return;
+
+      try {
+        const GATEWAY_URL =
+          process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:8080";
+        const response = await fetch(
+          `${GATEWAY_URL}/api/seller-shop/${user.id}`
+        );
+        const data = await response.json();
+
+        if (data.success && data.shop) {
+          setShopWebsite(data.shop.website);
+        }
+      } catch (error) {
+        console.error("Error fetching shop:", error);
+      }
+    };
+
+    if (!loading && isLoggedIn) {
+      fetchShopWebsite();
+    }
+  }, [user, loading, isLoggedIn]);
+
+  // Fetch orders data
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!shopWebsite) return;
+
+      try {
+        setLoadingData(true);
+        const GATEWAY_URL =
+          process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:8080";
+        const encodedShopWebsite = encodeURIComponent(shopWebsite);
+        const response = await fetch(
+          `${GATEWAY_URL}/orders/shop-name/${encodedShopWebsite}`
+        );
+        const data = await response.json();
+
+        if (data.success && data.data.orders) {
+          const fetchedOrders = data.data.orders;
+          setOrders(fetchedOrders);
+          calculateStats(fetchedOrders);
+          calculateMonthlyData(fetchedOrders);
+          calculateTopProducts(fetchedOrders);
+          setRecentOrders(fetchedOrders.slice(0, 5));
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchOrders();
+  }, [shopWebsite]);
+
+  const calculateStats = (ordersData: Order[]) => {
+    const totalRevenue = ordersData.reduce(
+      (sum, order) => sum + order.totalAmount,
+      0
+    );
+    const totalOrders = ordersData.length;
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    // Calculate growth (comparing last 30 days vs previous 30 days)
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    const recentOrders = ordersData.filter(
+      (order) => new Date(order.createdAt) >= thirtyDaysAgo
+    );
+    const previousOrders = ordersData.filter(
+      (order) =>
+        new Date(order.createdAt) >= sixtyDaysAgo &&
+        new Date(order.createdAt) < thirtyDaysAgo
+    );
+
+    const recentRevenue = recentOrders.reduce(
+      (sum, order) => sum + order.totalAmount,
+      0
+    );
+    const previousRevenue = previousOrders.reduce(
+      (sum, order) => sum + order.totalAmount,
+      0
+    );
+
+    const revenueChange =
+      previousRevenue > 0
+        ? ((recentRevenue - previousRevenue) / previousRevenue) * 100
+        : 0;
+    const ordersChange =
+      previousOrders.length > 0
+        ? ((recentOrders.length - previousOrders.length) /
+            previousOrders.length) *
+          100
+        : 0;
+
+    setStats({
+      avgOrderValue,
+      totalOrders,
+      totalRevenue,
+      revenueChange,
+      ordersChange,
+    });
+  };
+
+  const calculateMonthlyData = (ordersData: Order[]) => {
+    const monthlyMap = new Map<string, { revenue: number; orders: number }>();
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Get last 8 months
+    const now = new Date();
+    for (let i = 7; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      const monthLabel = monthNames[date.getMonth()];
+      monthlyMap.set(monthKey, { revenue: 0, orders: 0 });
+    }
+
+    // Aggregate orders by month
+    ordersData.forEach((order) => {
+      const orderDate = new Date(order.createdAt);
+      const monthKey = `${orderDate.getFullYear()}-${orderDate.getMonth()}`;
+      const existing = monthlyMap.get(monthKey);
+      if (existing) {
+        existing.revenue += order.totalAmount;
+        existing.orders += 1;
+      }
+    });
+
+    // Convert to array
+    const data: MonthlyData[] = [];
+    let monthIndex = 0;
+    monthlyMap.forEach((value, key) => {
+      const [year, month] = key.split("-").map(Number);
+      data.push({
+        month: monthNames[month],
+        revenue: value.revenue,
+        orders: value.orders,
+      });
+      monthIndex++;
+    });
+
+    setMonthlyData(data);
+  };
+
+  const calculateTopProducts = (ordersData: Order[]) => {
+    const productMap = new Map<
+      string,
+      { totalQuantity: number; totalRevenue: number }
+    >();
+
+    ordersData.forEach((order) => {
+      order.items.forEach((item) => {
+        const existing = productMap.get(item.productName);
+        if (existing) {
+          existing.totalQuantity += item.quantity;
+          existing.totalRevenue += item.totalPrice;
+        } else {
+          productMap.set(item.productName, {
+            totalQuantity: item.quantity,
+            totalRevenue: item.totalPrice,
+          });
+        }
+      });
+    });
+
+    // Sort by quantity and get top 5
+    const sorted = Array.from(productMap.entries())
+      .map(([productName, data]) => ({
+        productName,
+        ...data,
+      }))
+      .sort((a, b) => b.totalQuantity - a.totalQuantity)
+      .slice(0, 5);
+
+    setTopProducts(sorted);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "delivered":
+        return "text-green-600 bg-green-50";
+      case "shipped":
+        return "text-blue-600 bg-blue-50";
+      case "preparing":
+        return "text-yellow-600 bg-yellow-50";
+      case "cancelled":
+        return "text-red-600 bg-red-50";
+      default:
+        return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   if (loading) {
     return (
@@ -115,6 +329,9 @@ export default function DashboardPage() {
   if (!isLoggedIn) {
     return null;
   }
+
+  const maxRevenue = Math.max(...monthlyData.map((d) => d.revenue), 1);
+  const maxOrders = Math.max(...monthlyData.map((d) => d.orders), 1);
 
   const menuItems = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
@@ -268,9 +485,21 @@ export default function DashboardPage() {
                 <p className="text-gray-300 text-sm">AVG. Order Value</p>
                 <Receipt className="text-gray-400" size={24} />
               </div>
-              <p className="text-4xl font-black mb-2">LKR 23,165</p>
-              <p className="text-sm text-green-400">
-                + 2.18% <span className="text-gray-400">From last month</span>
+              <p className="text-4xl font-black mb-2">
+                {loadingData ? (
+                  <RefreshCw className="animate-spin" size={32} />
+                ) : (
+                  `LKR ${stats.avgOrderValue.toFixed(2)}`
+                )}
+              </p>
+              <p
+                className={`text-sm ${
+                  stats.revenueChange >= 0 ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                {stats.revenueChange >= 0 ? "+" : ""}
+                {stats.revenueChange.toFixed(2)}%{" "}
+                <span className="text-gray-400">From last month</span>
               </p>
             </div>
 
@@ -280,21 +509,45 @@ export default function DashboardPage() {
                 <p className="text-gray-600 text-sm">Total Orders</p>
                 <ShoppingCart className="text-gray-400" size={24} />
               </div>
-              <p className="text-4xl font-black mb-2 text-black">2,107</p>
-              <p className="text-sm text-red-500">
-                - 1.13% <span className="text-gray-500">From last month</span>
+              <p className="text-4xl font-black mb-2 text-black">
+                {loadingData ? (
+                  <RefreshCw className="animate-spin" size={32} />
+                ) : (
+                  stats.totalOrders.toLocaleString()
+                )}
+              </p>
+              <p
+                className={`text-sm ${
+                  stats.ordersChange >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {stats.ordersChange >= 0 ? "+" : ""}
+                {stats.ordersChange.toFixed(2)}%{" "}
+                <span className="text-gray-500">From last month</span>
               </p>
             </div>
 
-            {/* Lifetime Value */}
+            {/* Total Revenue */}
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-gray-600 text-sm">Lifetime Value</p>
+                <p className="text-gray-600 text-sm">Total Revenue</p>
                 <DollarSign className="text-gray-400" size={24} />
               </div>
-              <p className="text-4xl font-black mb-2 text-black">LKR 195,900</p>
-              <p className="text-sm text-green-500">
-                + 2.24% <span className="text-gray-500">From last month</span>
+              <p className="text-4xl font-black mb-2 text-black">
+                {loadingData ? (
+                  <RefreshCw className="animate-spin" size={32} />
+                ) : (
+                  `LKR ${stats.totalRevenue.toLocaleString()}`
+                )}
+              </p>
+              <p
+                className={`text-sm ${
+                  stats.revenueChange >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {stats.revenueChange >= 0 ? "+" : ""}
+                {stats.revenueChange.toFixed(2)}%{" "}
+                <span className="text-gray-500">From last month</span>
               </p>
             </div>
           </div>
@@ -316,28 +569,42 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="h-[300px] flex items-end justify-between gap-2 px-4">
-                {salesData.map((data, index) => (
-                  <div
-                    key={index}
-                    className="flex-1 flex flex-col items-center gap-2"
-                  >
-                    <div className="relative w-full h-[250px] flex items-end gap-1">
-                      <div
-                        className="flex-1 bg-purple-500 rounded-t"
-                        style={{ height: `${data.revenue / 75000}%` }}
-                        title={`Revenue: LKR ${data.revenue.toLocaleString()}`}
-                      />
-                      <div
-                        className="flex-1 bg-blue-500 rounded-t"
-                        style={{ height: `${data.orders / 2}%` }}
-                        title={`Orders: ${data.orders}`}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-600 font-semibold">
-                      {data.month}
-                    </span>
+                {loadingData ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <RefreshCw className="animate-spin" size={48} />
                   </div>
-                ))}
+                ) : monthlyData.length === 0 ? (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    No data available
+                  </div>
+                ) : (
+                  monthlyData.map((data, index) => (
+                    <div
+                      key={index}
+                      className="flex-1 flex flex-col items-center gap-2"
+                    >
+                      <div className="relative w-full h-[250px] flex items-end gap-1">
+                        <div
+                          className="flex-1 bg-purple-500 rounded-t"
+                          style={{
+                            height: `${(data.revenue / maxRevenue) * 100}%`,
+                          }}
+                          title={`Revenue: LKR ${data.revenue.toLocaleString()}`}
+                        />
+                        <div
+                          className="flex-1 bg-blue-500 rounded-t"
+                          style={{
+                            height: `${(data.orders / maxOrders) * 100}%`,
+                          }}
+                          title={`Orders: ${data.orders}`}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-600 font-semibold">
+                        {data.month}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -345,25 +612,42 @@ export default function DashboardPage() {
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-black">Top Selling Product</h2>
-                <button className="text-sm text-black font-semibold hover:underline">
+                <button
+                  onClick={() => router.push("/dashboard/products")}
+                  className="text-sm text-black font-semibold hover:underline"
+                >
                   See All Product
                 </button>
               </div>
               <div className="space-y-4">
-                {topProducts.map((product) => (
-                  <div key={product.id} className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm text-black truncate">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-gray-500">{product.stock}</p>
-                    </div>
-                    <span className="text-xs text-green-600 font-semibold whitespace-nowrap">
-                      Available
-                    </span>
+                {loadingData ? (
+                  <div className="text-center py-8">
+                    <RefreshCw className="animate-spin mx-auto" size={32} />
                   </div>
-                ))}
+                ) : topProducts.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    No products available
+                  </div>
+                ) : (
+                  topProducts.map((product, index) => (
+                    <div key={index} className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center">
+                        <Package className="text-gray-500" size={20} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-sm text-black truncate">
+                          {product.productName}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {product.totalQuantity} Units Sold
+                        </p>
+                      </div>
+                      <span className="text-xs text-green-600 font-semibold whitespace-nowrap">
+                        LKR {product.totalRevenue.toLocaleString()}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -412,36 +696,73 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="border-b border-gray-100 hover:bg-gray-50"
-                    >
-                      <td className="py-4 px-4 font-semibold text-sm">
-                        {order.id}
-                      </td>
-                      <td className="py-4 px-4 text-sm">{order.product}</td>
-                      <td className="py-4 px-4 text-sm text-gray-600">
-                        {order.date}
-                      </td>
-                      <td className="py-4 px-4 font-bold text-sm">
-                        {order.price}
-                      </td>
-                      <td className="py-4 px-4 text-sm">{order.payment}</td>
-                      <td className="py-4 px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${order.statusColor}`}
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <button className="text-gray-400 hover:text-black">
-                          <SettingsIcon size={18} />
-                        </button>
+                  {loadingData ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center">
+                        <RefreshCw className="animate-spin mx-auto" size={32} />
                       </td>
                     </tr>
-                  ))}
+                  ) : recentOrders.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="py-8 text-center text-gray-400"
+                      >
+                        No orders available
+                      </td>
+                    </tr>
+                  ) : (
+                    recentOrders.map((order) => (
+                      <tr
+                        key={order.id}
+                        className="border-b border-gray-100 hover:bg-gray-50"
+                      >
+                        <td className="py-4 px-4 font-semibold text-sm">
+                          #{order.orderId.slice(-8)}
+                        </td>
+                        <td className="py-4 px-4 text-sm">
+                          {order.items.length > 0
+                            ? order.items[0].productName
+                            : "N/A"}
+                          {order.items.length > 1 && (
+                            <span className="text-gray-500">
+                              {" "}
+                              +{order.items.length - 1} more
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-sm text-gray-600">
+                          {formatDate(order.createdAt)}
+                        </td>
+                        <td className="py-4 px-4 font-bold text-sm">
+                          {order.currency.toUpperCase()}{" "}
+                          {order.totalAmount.toFixed(2)}
+                        </td>
+                        <td className="py-4 px-4 text-sm capitalize">
+                          {order.paymentStatus}
+                        </td>
+                        <td className="py-4 px-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(
+                              order.deliveryStatus
+                            )}`}
+                          >
+                            {order.deliveryStatus}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <button
+                            onClick={() =>
+                              router.push("/dashboard/orders")
+                            }
+                            className="text-gray-400 hover:text-black"
+                          >
+                            <SettingsIcon size={18} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
