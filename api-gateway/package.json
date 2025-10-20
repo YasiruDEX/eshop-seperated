@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "ts-node src/main.ts",
     "build": "tsc",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "prebuild": "npm install --save typescript ts-node"
   },
   "dependencies": {
     "axios": "^1.7.9",
@@ -16,7 +17,9 @@
     "express-http-proxy": "^2.1.1",
     "express-rate-limit": "^7.4.1",
     "morgan": "^1.10.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.7",
@@ -25,8 +28,6 @@
     "@types/express-http-proxy": "^1.6.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.0.0",
-    "@types/swagger-ui-express": "^4.1.6",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.0"
+    "@types/swagger-ui-express": "^4.1.6"
   }
 }

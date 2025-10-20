@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.next
+.pids
+node_modules
+npm-debug.log
+.DS_Store
+dist
+build
+.env.local
+.env.*.local
+test/
+coverage/
