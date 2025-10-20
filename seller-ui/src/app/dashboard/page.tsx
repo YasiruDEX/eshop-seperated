@@ -752,9 +752,7 @@ export default function DashboardPage() {
                         </td>
                         <td className="py-4 px-4">
                           <button
-                            onClick={() =>
-                              router.push("/dashboard/orders")
-                            }
+                            onClick={() => router.push("/dashboard/orders")}
                             className="text-gray-400 hover:text-black"
                           >
                             <SettingsIcon size={18} />
