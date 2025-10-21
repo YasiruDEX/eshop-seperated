@@ -335,13 +335,24 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Services configured:`);
-  console.log(`  - Auth: ${AUTH_SERVICE_URL}`);
-  console.log(`  - Catalogue: ${CATALOGUE_SERVICE_URL}`);
-  console.log(`  - Orders: ${ORDER_SERVICE_URL}`);
-  console.log(`  - Checkout: ${CHECKOUT_SERVICE_URL}`);
-  console.log(`  - Customer: ${CUSTOMER_SERVICE_URL}`);
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`🚀 API GATEWAY STARTED`);
+  console.log(`${'='.repeat(60)}`);
+  console.log(`📍 Listening at: http://localhost:${port}/api`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`\n📡 CONFIGURED MICROSERVICES:`);
+  console.log(`${'─'.repeat(60)}`);
+  console.log(`  🔐 Auth Service:         ${AUTH_SERVICE_URL}`);
+  console.log(`  📦 Catalogue Service:    ${CATALOGUE_SERVICE_URL}`);
+  console.log(`  ⭐ Review Service:       ${REVIEW_SERVICE_URL}`);
+  console.log(`  🔔 Notification Service: ${NOTIFICATION_SERVICE_URL}`);
+  console.log(`  💳 Payment Service:      ${PAYMENT_SERVICE_URL}`);
+  console.log(`  📊 Inventory Service:    ${INVENTORY_SERVICE_URL}`);
+  console.log(`  💬 Messaging Service:    ${MESSAGING_SERVICE_URL}`);
+  console.log(`  🛒 Checkout Service:     ${CHECKOUT_SERVICE_URL}`);
+  console.log(`  📋 Order Service:        ${ORDER_SERVICE_URL}`);
+  console.log(`  👤 Customer Service:     ${CUSTOMER_SERVICE_URL}`);
+  console.log(`  🤖 AI Search Service:    ${AI_SEARCH_SERVICE_URL}`);
+  console.log(`${'='.repeat(60)}\n`);
 });
 server.on("error", console.error);
