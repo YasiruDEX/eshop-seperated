@@ -25,9 +25,9 @@ const app = express();
 const AUTH_SERVICE_URL =
   process.env.AUTH_SERVICE_URL || "https://eshop-auth-uq9z.onrender.com";
 const CATALOGUE_SERVICE_URL =
-  process.env.CATALOGUE_SERVICE_URL || "https://eshop-catalogue.onrender.co";
+  process.env.CATALOGUE_SERVICE_URL || "https://eshop-catalogue.onrender.com";
 const REVIEW_SERVICE_URL =
-  process.env.REVIEW_SERVICE_URL || "http://localhost:6005";
+  process.env.REVIEW_SERVICE_URL || "https://eshop-reviews.onrender.com";
 const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || "http://localhost:6003";
 const PAYMENT_SERVICE_URL =
