@@ -116,14 +116,58 @@ app.get("/gateway-health", (req, res) => {
   res.send({ message: "Welcome to api-gateway!" });
 });
 
+// Debug endpoint to check service URLs (only in non-production)
+app.get("/gateway-config", (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ error: "Not available in production" });
+  }
+  res.json({
+    AUTH_SERVICE_URL,
+    CATALOGUE_SERVICE_URL,
+    REVIEW_SERVICE_URL,
+    NOTIFICATION_SERVICE_URL,
+    PAYMENT_SERVICE_URL,
+    INVENTORY_SERVICE_URL,
+    MESSAGING_SERVICE_URL,
+    CHECKOUT_SERVICE_URL,
+    ORDER_SERVICE_URL,
+    CUSTOMER_SERVICE_URL,
+    AI_SEARCH_SERVICE_URL,
+  });
+});
+
 // Create an Express router for API routes
 const apiRouter = express.Router();
+
+// Proxy error handler
+const proxyErrorHandler = (serviceName: string, serviceUrl: string) => {
+  return (err: any, req: any, res: any, next: any) => {
+    console.error(`[${serviceName}] Proxy Error:`, err.message);
+    console.error(`[${serviceName}] Target URL:`, serviceUrl);
+    
+    if (err.code === 'ECONNREFUSED') {
+      return res.status(503).json({
+        error: 'Service Unavailable',
+        message: `Cannot connect to ${serviceName}. The service might be starting up or unavailable.`,
+        service: serviceName,
+        target: serviceUrl
+      });
+    }
+    
+    res.status(500).json({
+      error: 'Proxy Error',
+      message: err.message,
+      service: serviceName
+    });
+  };
+};
 
 // Specific routes first (before wildcard)
 apiRouter.use(
   "/auth",
   proxy(AUTH_SERVICE_URL, {
     https: true,
+    timeout: 30000, // 30 second timeout
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
       if (srcReq.headers.cookie) {
@@ -165,6 +209,7 @@ apiRouter.use(
 apiRouter.use(
   "/catalogue",
   proxy(CATALOGUE_SERVICE_URL, {
+    timeout: 30000,
     proxyReqPathResolver: (req) => {
       // Map /api/catalogue/* to /products/*
       const path = req.url;
@@ -211,18 +256,21 @@ apiRouter.use(
 apiRouter.use(
   "/cart",
   proxy(CHECKOUT_SERVICE_URL, {
+    timeout: 30000,
     proxyReqPathResolver: (req) => `/cart${req.url}`, // Preserve full path
   })
 ); // Checkout Service
 apiRouter.use(
   "/wishlist",
   proxy(CHECKOUT_SERVICE_URL, {
+    timeout: 30000,
     proxyReqPathResolver: (req) => `/wishlist${req.url}`, // Preserve full path
   })
 ); // Checkout Service - Wishlist
 apiRouter.use(
   "/orders",
   proxy(ORDER_SERVICE_URL, {
+    timeout: 30000,
     proxyReqPathResolver: (req) => `/orders${req.url}`, // Preserve full path
   })
 ); // Order Service
@@ -259,8 +307,41 @@ app.use("/api", apiRouter);
 // For backward compatibility, also mount routes at the root level
 app.use("/", apiRouter);
 
+// Global error handler for proxy errors
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Global Error Handler:', err);
+  
+  if (err.code === 'ECONNREFUSED') {
+    return res.status(503).json({
+      error: 'Service Unavailable',
+      message: 'Cannot connect to the backend service. It may be starting up or temporarily unavailable. Please try again in a moment.',
+      code: err.code
+    });
+  }
+  
+  if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+    return res.status(504).json({
+      error: 'Gateway Timeout',
+      message: 'The backend service took too long to respond. Please try again.',
+      code: err.code
+    });
+  }
+  
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: err.message || 'An unexpected error occurred'
+  });
+});
+
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Services configured:`);
+  console.log(`  - Auth: ${AUTH_SERVICE_URL}`);
+  console.log(`  - Catalogue: ${CATALOGUE_SERVICE_URL}`);
+  console.log(`  - Orders: ${ORDER_SERVICE_URL}`);
+  console.log(`  - Checkout: ${CHECKOUT_SERVICE_URL}`);
+  console.log(`  - Customer: ${CUSTOMER_SERVICE_URL}`);
 });
 server.on("error", console.error);
