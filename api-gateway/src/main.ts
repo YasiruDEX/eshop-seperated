@@ -141,6 +141,7 @@ apiRouter.use(
   "/auth",
   proxy(AUTH_SERVICE_URL, {
     https: true,
+    proxyReqPathResolver: (req) => `/api/auth${req.url}`, // Map /api/auth/* to auth service /api/auth/*
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
       if (srcReq.headers.cookie) {
@@ -158,6 +159,91 @@ apiRouter.use(
     },
   })
 ); // Auth Service
+
+// Direct login endpoints (backward compatibility)
+apiRouter.use(
+  "/login-user",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/login-user${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
+
+apiRouter.use(
+  "/login-seller",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/login-seller${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
+
+apiRouter.use(
+  "/register-user",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/register-user${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
+
+apiRouter.use(
+  "/register-seller",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/register-seller${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
 apiRouter.use(
   "/seller-shop",
   proxy(AUTH_SERVICE_URL, {
