@@ -11,11 +11,13 @@ Your services are sleeping on Render's free tier causing 500 errors. Set up thes
 ## Cron Jobs to Create
 
 ### 1. Auth Service Health Check
+
 - **URL**: `https://eshop-auth-uq9z.onrender.com/api/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 2. Catalogue Service Health Check
+
 - **URL**: `https://eshop-catalogue.onrender.com/products/filter`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: POST
@@ -23,31 +25,37 @@ Your services are sleeping on Render's free tier causing 500 errors. Set up thes
 - **Headers**: `Content-Type: application/json`
 
 ### 3. Checkout Service Health Check
+
 - **URL**: `https://eshop-checkout.onrender.com/cart/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 4. Order Service Health Check
+
 - **URL**: `https://eshop-orders.onrender.com/orders/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 5. Customer Service Health Check
+
 - **URL**: `https://eshop-customer-880k.onrender.com/api/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 6. Review Service Health Check
+
 - **URL**: `https://eshop-reviews.onrender.com/reviews/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 7. Inventory Service Health Check
+
 - **URL**: `https://eshop-inventory.onrender.com/inventory/health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
 
 ### 8. API Gateway Health Check
+
 - **URL**: `https://eshop-api-gateway-g686.onrender.com/gateway-health`
 - **Schedule**: Every 10 minutes (`*/10 * * * *`)
 - **Method**: GET
@@ -61,7 +69,7 @@ Create a GitHub Action that runs every 10 minutes:
 name: Keep Services Warm
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Every 10 minutes
+    - cron: "*/10 * * * *" # Every 10 minutes
   workflow_dispatch:
 
 jobs:
@@ -89,6 +97,7 @@ jobs:
 ## After Setup
 
 Once cron jobs are running:
+
 - ✅ Services stay active
 - ✅ No more 500 errors from sleeping services
 - ✅ Fast response times (no cold starts)
