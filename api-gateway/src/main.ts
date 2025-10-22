@@ -118,9 +118,6 @@ app.get("/gateway-health", (req, res) => {
 
 // Debug endpoint to check service URLs (only in non-production)
 app.get("/gateway-config", (req, res) => {
-  if (process.env.NODE_ENV === "production") {
-    return res.status(403).json({ error: "Not available in production" });
-  }
   res.json({
     AUTH_SERVICE_URL,
     CATALOGUE_SERVICE_URL,
@@ -281,39 +278,41 @@ app.use("/", apiRouter);
 
 // Global error handler for proxy errors
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error('Global Error Handler:', err);
-  
-  if (err.code === 'ECONNREFUSED') {
+  console.error("Global Error Handler:", err);
+
+  if (err.code === "ECONNREFUSED") {
     return res.status(503).json({
-      error: 'Service Unavailable',
-      message: 'Cannot connect to the backend service. It may be starting up or temporarily unavailable. Please try again in a moment.',
-      code: err.code
+      error: "Service Unavailable",
+      message:
+        "Cannot connect to the backend service. It may be starting up or temporarily unavailable. Please try again in a moment.",
+      code: err.code,
     });
   }
-  
-  if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+
+  if (err.code === "ETIMEDOUT" || err.code === "ESOCKETTIMEDOUT") {
     return res.status(504).json({
-      error: 'Gateway Timeout',
-      message: 'The backend service took too long to respond. Please try again.',
-      code: err.code
+      error: "Gateway Timeout",
+      message:
+        "The backend service took too long to respond. Please try again.",
+      code: err.code,
     });
   }
-  
+
   res.status(500).json({
-    error: 'Internal Server Error',
-    message: err.message || 'An unexpected error occurred'
+    error: "Internal Server Error",
+    message: err.message || "An unexpected error occurred",
   });
 });
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
-  console.log(`\n${'='.repeat(60)}`);
+  console.log(`\n${"=".repeat(60)}`);
   console.log(`🚀 API GATEWAY STARTED`);
-  console.log(`${'='.repeat(60)}`);
+  console.log(`${"=".repeat(60)}`);
   console.log(`📍 Listening at: http://localhost:${port}/api`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`\n📡 CONFIGURED MICROSERVICES:`);
-  console.log(`${'─'.repeat(60)}`);
+  console.log(`${"─".repeat(60)}`);
   console.log(`  🔐 Auth Service:         ${AUTH_SERVICE_URL}`);
   console.log(`  📦 Catalogue Service:    ${CATALOGUE_SERVICE_URL}`);
   console.log(`  ⭐ Review Service:       ${REVIEW_SERVICE_URL}`);
@@ -325,6 +324,6 @@ const server = app.listen(port, () => {
   console.log(`  📋 Order Service:        ${ORDER_SERVICE_URL}`);
   console.log(`  👤 Customer Service:     ${CUSTOMER_SERVICE_URL}`);
   console.log(`  🤖 AI Search Service:    ${AI_SEARCH_SERVICE_URL}`);
-  console.log(`${'='.repeat(60)}\n`);
+  console.log(`${"=".repeat(60)}\n`);
 });
 server.on("error", console.error);
