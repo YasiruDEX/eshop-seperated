@@ -139,35 +139,11 @@ app.get("/gateway-config", (req, res) => {
 // Create an Express router for API routes
 const apiRouter = express.Router();
 
-// Proxy error handler
-const proxyErrorHandler = (serviceName: string, serviceUrl: string) => {
-  return (err: any, req: any, res: any, next: any) => {
-    console.error(`[${serviceName}] Proxy Error:`, err.message);
-    console.error(`[${serviceName}] Target URL:`, serviceUrl);
-    
-    if (err.code === 'ECONNREFUSED') {
-      return res.status(503).json({
-        error: 'Service Unavailable',
-        message: `Cannot connect to ${serviceName}. The service might be starting up or unavailable.`,
-        service: serviceName,
-        target: serviceUrl
-      });
-    }
-    
-    res.status(500).json({
-      error: 'Proxy Error',
-      message: err.message,
-      service: serviceName
-    });
-  };
-};
-
 // Specific routes first (before wildcard)
 apiRouter.use(
   "/auth",
   proxy(AUTH_SERVICE_URL, {
     https: true,
-    timeout: 30000, // 30 second timeout
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Forward cookies from the original request
       if (srcReq.headers.cookie) {
@@ -209,7 +185,6 @@ apiRouter.use(
 apiRouter.use(
   "/catalogue",
   proxy(CATALOGUE_SERVICE_URL, {
-    timeout: 30000,
     proxyReqPathResolver: (req) => {
       // Map /api/catalogue/* to /products/*
       const path = req.url;
@@ -256,21 +231,18 @@ apiRouter.use(
 apiRouter.use(
   "/cart",
   proxy(CHECKOUT_SERVICE_URL, {
-    timeout: 30000,
     proxyReqPathResolver: (req) => `/cart${req.url}`, // Preserve full path
   })
 ); // Checkout Service
 apiRouter.use(
   "/wishlist",
   proxy(CHECKOUT_SERVICE_URL, {
-    timeout: 30000,
     proxyReqPathResolver: (req) => `/wishlist${req.url}`, // Preserve full path
   })
 ); // Checkout Service - Wishlist
 apiRouter.use(
   "/orders",
   proxy(ORDER_SERVICE_URL, {
-    timeout: 30000,
     proxyReqPathResolver: (req) => `/orders${req.url}`, // Preserve full path
   })
 ); // Order Service
