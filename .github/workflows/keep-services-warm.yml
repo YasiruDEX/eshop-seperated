@@ -1,0 +1,44 @@
+name: Keep Render Services Warm
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  ping-services:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping All Render Services
+        run: |
+          echo "🚀 Starting service health checks..."
+          
+          echo "📡 Pinging API Gateway..."
+          curl -f -s https://eshop-api-gateway-g686.onrender.com/gateway-health || echo "❌ API Gateway failed"
+          
+          echo "🔐 Pinging Auth Service..."
+          curl -f -s https://eshop-auth-uq9z.onrender.com/api/health || echo "❌ Auth Service failed"
+          
+          echo "📦 Pinging Catalogue Service..."
+          curl -f -s -X POST https://eshop-catalogue.onrender.com/products/filter \
+            -H "Content-Type: application/json" \
+            -d '{"category":"all","limit":1}' || echo "❌ Catalogue Service failed"
+          
+          echo "🛒 Pinging Checkout Service..."
+          curl -f -s https://eshop-checkout.onrender.com/cart/health || echo "❌ Checkout Service failed"
+          
+          echo "📋 Pinging Order Service..."
+          curl -f -s https://eshop-orders.onrender.com/orders/health || echo "❌ Order Service failed"
+          
+          echo "👤 Pinging Customer Service..."
+          curl -f -s https://eshop-customer-880k.onrender.com/api/health || echo "❌ Customer Service failed"
+          
+          echo "⭐ Pinging Review Service..."
+          curl -f -s https://eshop-reviews.onrender.com/reviews/health || echo "❌ Review Service failed"
+          
+          echo "📊 Pinging Inventory Service..."
+          curl -f -s https://eshop-inventory.onrender.com/inventory/health || echo "❌ Inventory Service failed"
+          
+          echo "✅ All service health checks completed!"

@@ -3,10 +3,14 @@ services:
     name: api-gateway
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    branch: main
+    buildCommand: npm ci && npm run build
     startCommand: npm start
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_OPTIONS
         value: --max_old_space_size=512
+      - key: PORT
+        value: 8080
