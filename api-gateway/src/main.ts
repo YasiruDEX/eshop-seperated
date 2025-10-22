@@ -225,6 +225,27 @@ apiRouter.use(
 );
 
 apiRouter.use(
+  "/user-registration",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/user-registration${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
+
+apiRouter.use(
   "/register-seller",
   proxy(AUTH_SERVICE_URL, {
     https: true,
@@ -244,6 +265,28 @@ apiRouter.use(
     },
   })
 );
+
+apiRouter.use(
+  "/seller-registration",
+  proxy(AUTH_SERVICE_URL, {
+    https: true,
+    proxyReqPathResolver: (req) => `/api/seller-registration${req.url}`,
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+      if (srcReq.headers.cookie) {
+        proxyReqOpts.headers = proxyReqOpts.headers || {};
+        proxyReqOpts.headers["cookie"] = srcReq.headers.cookie;
+      }
+      return proxyReqOpts;
+    },
+    userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
+      if (proxyRes.headers["set-cookie"]) {
+        userRes.setHeader("set-cookie", proxyRes.headers["set-cookie"]);
+      }
+      return proxyResData;
+    },
+  })
+);
+
 apiRouter.use(
   "/seller-shop",
   proxy(AUTH_SERVICE_URL, {
