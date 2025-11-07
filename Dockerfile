@@ -32,9 +32,9 @@ RUN echo "Building auth-service..." && \
     npm run build && \
     echo "✓ auth-service built successfully"
 
+# Build catalogue-service (No Prisma)
 RUN echo "Building catalogue-service..." && \
     cd catalogue-service && npm ci && \
-    npx prisma generate && \
     npm run build && \
     echo "✓ catalogue-service built successfully"
 
@@ -73,6 +73,19 @@ RUN echo "Building review-service..." && \
     npx prisma generate && \
     npm run build && \
     echo "✓ review-service built successfully"
+
+# Build messaging-service  
+RUN echo "Building messaging-service..." && \
+    cd messaging-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
+    echo "✓ messaging-service built successfully"
+
+# Build notification-service (No Prisma)
+RUN echo "Building notification-service..." && \
+    cd notification-service && npm ci && \
+    npm run build && \
+    echo "✓ notification-service built successfully"
 
 # Copy PM2 ecosystem file
 COPY ecosystem.config.js .
