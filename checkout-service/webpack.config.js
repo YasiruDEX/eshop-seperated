@@ -8,6 +8,8 @@ module.exports = {
   externals: {
     '@prisma/client': 'commonjs @prisma/client',
     '.prisma/client': 'commonjs .prisma/client',
+    // Externalize the custom Prisma generated client path
+    '../../../../generated/prisma-checkout': 'commonjs ../../../../generated/prisma-checkout',
   },
   plugins: [
     new NxAppWebpackPlugin({

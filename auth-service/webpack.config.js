@@ -12,6 +12,7 @@ module.exports = {
   },
   externals: {
     '@prisma/client': 'commonjs @prisma/client',
+    '@prisma/auth-client': 'commonjs @prisma/auth-client',
     '.prisma/client': 'commonjs .prisma/client',
   },
   plugins: [

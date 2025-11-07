@@ -13,6 +13,8 @@ module.exports = {
   externals: {
     '@prisma/client': 'commonjs @prisma/client',
     '.prisma/client': 'commonjs .prisma/client',
+    // Externalize the custom Prisma generated client path
+    '../../../../generated/prisma-messaging': 'commonjs ../../../../generated/prisma-messaging',
   },
   plugins: [
     new NxAppWebpackPlugin({
