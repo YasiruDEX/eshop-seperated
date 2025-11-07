@@ -1,0 +1,39 @@
+services:
+  # Main API Gateway (Web Service)
+  - type: web
+    name: eshop-gateway
+    env: node
+    plan: free
+    branch: main
+    buildCommand: |
+      cd api-gateway && npm ci && npm run build
+    startCommand: cd api-gateway && npm start
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: NODE_ENV
+        value: production
+      - key: AUTH_SERVICE_URL
+        value: http://localhost:6001
+      - key: CATALOGUE_SERVICE_URL
+        value: http://localhost:6002
+      # ... other env vars
+
+  # Background Workers for other services
+  - type: worker
+    name: auth-service-worker
+    env: node
+    plan: free
+    branch: main
+    buildCommand: cd auth-service && npm ci && npm run build
+    startCommand: cd auth-service && npm start
+    
+  - type: worker
+    name: catalogue-service-worker
+    env: node
+    plan: free
+    branch: main
+    buildCommand: cd catalogue-service && npm ci && npm run build
+    startCommand: cd catalogue-service && npm start
+    
+  # Add more workers for each service...
