@@ -32,9 +32,10 @@ RUN echo "Building auth-service..." && \
     npm run build && \
     echo "✓ auth-service built successfully"
 
-# Build catalogue-service (No Prisma)
+# Build catalogue-service (custom Prisma schema path)
 RUN echo "Building catalogue-service..." && \
     cd catalogue-service && npm ci && \
+    npx prisma generate --schema=./prisma/catalogue.prisma && \
     npm run build && \
     echo "✓ catalogue-service built successfully"
 
