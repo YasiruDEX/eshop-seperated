@@ -5,6 +5,10 @@ module.exports = {
   output: {
     path: join(__dirname, '../../dist/apps/payment-service'),
   },
+  externals: {
+    '@prisma/client': 'commonjs @prisma/client',
+    '.prisma/client': 'commonjs .prisma/client',
+  },
   plugins: [
     new NxAppWebpackPlugin({
       target: 'node',

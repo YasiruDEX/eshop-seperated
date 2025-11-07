@@ -21,7 +21,9 @@ COPY payment-service ./payment-service
 COPY review-service ./review-service
 COPY packages ./packages
 
-# Install dependencies and build each service separately for better error reporting
+# Install dependencies and build each service separately
+# Using npm ci --only=production after build to keep Prisma clients but remove dev deps
+
 RUN echo "Building api-gateway..." && \
     cd api-gateway && npm ci && npm run build && \
     echo "✓ api-gateway built successfully"
@@ -92,7 +94,7 @@ RUN echo "Building notification-service..." && \
 COPY ecosystem.config.js .
 
 # Expose all service ports
-EXPOSE 8080 6001 6002 6003 6004 6005 6006 6007
+EXPOSE 8080 6001 6002 6003 6004 6005 6006 6007 6009 6010
 
 # Start all services with PM2
 CMD ["pm2-runtime", "start", "ecosystem.config.js"]

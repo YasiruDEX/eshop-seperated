@@ -10,6 +10,9 @@ module.exports = {
       '@packages': join(__dirname, '../../packages'),
     },
   },
+  externals: {
+    '@prisma/catalogue-client': 'commonjs @prisma/catalogue-client',
+  },
   plugins: [
     new NxAppWebpackPlugin({
       target: 'node',
