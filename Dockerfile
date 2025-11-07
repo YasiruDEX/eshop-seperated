@@ -93,8 +93,25 @@ RUN echo "Building notification-service..." && \
 # Copy PM2 ecosystem file
 COPY ecosystem.config.js .
 
+# Create a startup script to regenerate Prisma clients at runtime
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Regenerating Prisma clients..."' >> /app/start.sh && \
+    echo 'cd /app/auth-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/catalogue-service && npx prisma generate --schema=./prisma/catalogue.prisma' >> /app/start.sh && \
+    echo 'cd /app/checkout-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/customer-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/inventory-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/order-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/payment-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/review-service && npx prisma generate' >> /app/start.sh && \
+    echo 'cd /app/messaging-service && npx prisma generate' >> /app/start.sh && \
+    echo 'echo "✓ All Prisma clients regenerated"' >> /app/start.sh && \
+    echo 'cd /app' >> /app/start.sh && \
+    echo 'exec pm2-runtime start ecosystem.config.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
 # Expose all service ports
 EXPOSE 8080 6001 6002 6003 6004 6005 6006 6007 6009 6010
 
-# Start all services with PM2
-CMD ["pm2-runtime", "start", "ecosystem.config.js"]
+# Start all services with PM2 via startup script
+CMD ["/app/start.sh"]
