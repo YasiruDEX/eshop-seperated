@@ -27,35 +27,51 @@ RUN echo "Building api-gateway..." && \
     echo "✓ api-gateway built successfully"
 
 RUN echo "Building auth-service..." && \
-    cd auth-service && npm ci && npm run build && \
+    cd auth-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ auth-service built successfully"
 
 RUN echo "Building catalogue-service..." && \
-    cd catalogue-service && npm ci && npm run build && \
+    cd catalogue-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ catalogue-service built successfully"
 
 RUN echo "Building checkout-service..." && \
-    cd checkout-service && npm ci && npm run build && \
+    cd checkout-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ checkout-service built successfully"
 
 RUN echo "Building customer-service..." && \
-    cd customer-service && npm ci && npm run build && \
+    cd customer-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ customer-service built successfully"
 
 RUN echo "Building inventory-service..." && \
-    cd inventory-service && npm ci && npm run build && \
+    cd inventory-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ inventory-service built successfully"
 
 RUN echo "Building order-service..." && \
-    cd order-service && npm ci && npm run build && \
+    cd order-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ order-service built successfully"
 
 RUN echo "Building payment-service..." && \
-    cd payment-service && npm ci && npm run build && \
+    cd payment-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ payment-service built successfully"
 
 RUN echo "Building review-service..." && \
-    cd review-service && npm ci && npm run build && \
+    cd review-service && npm ci && \
+    npx prisma generate && \
+    npm run build && \
     echo "✓ review-service built successfully"
 
 # Copy PM2 ecosystem file
